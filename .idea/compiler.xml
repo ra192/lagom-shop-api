@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="category-api" />
+        <module name="category-impl" />
+        <module name="dao" />
+        <module name="daoimpl" />
+        <module name="hello-api" />
+        <module name="hello-impl" />
+        <module name="integration-test" />
+        <module name="service-api" />
+        <module name="service-impl" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cassandra-config" target="1.8" />
+      <module name="category-api" target="1.8" />
+      <module name="category-impl" target="1.8" />
+      <module name="dao" target="1.8" />
+      <module name="daoimpl" target="1.8" />
+      <module name="hello-api" target="1.8" />
+      <module name="hello-impl" target="1.8" />
+      <module name="integration-test" target="1.8" />
+      <module name="service-api" target="1.8" />
+      <module name="service-impl" target="1.8" />
+      <module name="shop-api" target="1.8" />
+      <module name="stream-api" target="1.8" />
+      <module name="stream-impl" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
