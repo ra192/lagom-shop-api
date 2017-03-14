@@ -12,7 +12,7 @@ import io.dwornik.dao.impl.CategoryDaoImpl;
 /**
  * The module that binds the HelloService so that it can be served.
  */
-public class HelloModule extends AbstractModule implements ServiceGuiceSupport {
+public class ShopApiModule extends AbstractModule implements ServiceGuiceSupport {
     @Override
     protected void configure() {
         bindServices(serviceBinding(CategoryService.class, CategoryServiceImpl.class));

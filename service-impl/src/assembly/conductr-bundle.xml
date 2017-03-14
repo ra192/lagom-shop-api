@@ -5,11 +5,11 @@
     <formats>
         <format>zip</format>
     </formats>
-    <baseDirectory>hello-v1</baseDirectory>
+    <baseDirectory>shop-api-v1</baseDirectory>
 
     <dependencySets>
         <dependencySet>
-            <outputDirectory>hello/lib</outputDirectory>
+            <outputDirectory>shop-api/lib</outputDirectory>
             <outputFileNameMapping>${artifact.groupId}-${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
         </dependencySet>
     </dependencySets>
@@ -19,12 +19,12 @@
             <outputDirectory></outputDirectory>
             <directory>src/bundle</directory>
             <excludes>
-                <exclude>hello/bin/**</exclude>
+                <exclude>shop-api/bin/**</exclude>
             </excludes>
         </fileSet>
         <fileSet>
-            <outputDirectory>hello/bin</outputDirectory>
-            <directory>src/bundle/hello/bin</directory>
+            <outputDirectory>shop-api/bin</outputDirectory>
+            <directory>src/bundle/shop-api/bin</directory>
             <fileMode>0755</fileMode>
         </fileSet>
     </fileSets>

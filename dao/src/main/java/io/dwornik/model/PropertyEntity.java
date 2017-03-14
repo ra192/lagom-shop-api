@@ -1,20 +1,18 @@
 package io.dwornik.model;
 
 /**
- * Created by yakov_000 on 10.03.2015.
+ * Created by yakov_000 on 16.03.2015.
  */
-public class Category {
+public class PropertyEntity {
 
     private Long id;
     private String name;
     private String displayName;
-    private Long parentId;
 
-    public Category(Long id, String name, String displayName, Long parentId) {
+    public PropertyEntity(Long id, String name, String displayName) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
-        this.parentId = parentId;
     }
 
     public Long getId() {
@@ -39,13 +37,5 @@ public class Category {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
     }
 }

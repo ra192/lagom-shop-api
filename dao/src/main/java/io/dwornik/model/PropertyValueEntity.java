@@ -1,18 +1,20 @@
 package io.dwornik.model;
 
 /**
- * Created by yakov_000 on 16.03.2015.
+ * Created by yakov_000 on 10.03.2015.
  */
-public class Property {
+public class PropertyValueEntity {
 
     private Long id;
     private String name;
     private String displayName;
+    private Long propertyId;
 
-    public Property(Long id, String name, String displayName) {
+    public PropertyValueEntity(Long id, String name, String displayName, Long propertyId) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
+        this.propertyId=propertyId;
     }
 
     public Long getId() {
@@ -37,5 +39,13 @@ public class Property {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public Long getPropertyId() {
+        return propertyId;
+    }
+
+    public void setPropertyId(Long propertyId) {
+        this.propertyId = propertyId;
     }
 }

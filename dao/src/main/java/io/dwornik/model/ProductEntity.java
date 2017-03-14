@@ -3,7 +3,7 @@ package io.dwornik.model;
 /**
  * Created by yakov_000 on 10.03.2015.
  */
-public class Product {
+public class ProductEntity {
 
     private Long id;
     private String code;
@@ -13,7 +13,7 @@ public class Product {
     private String imageUrl;
     private Long categoryId;
 
-    public Product(Long id, String code, String displayName, Double price, String description, String imageUrl, Long categoryId) {
+    public ProductEntity(Long id, String code, String displayName, Double price, String description, String imageUrl, Long categoryId) {
         this.id = id;
         this.code = code;
         this.displayName = displayName;
