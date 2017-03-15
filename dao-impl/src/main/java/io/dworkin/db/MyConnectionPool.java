@@ -6,7 +6,7 @@ import com.github.pgasync.Db;
 /**
  * Created by yakov on 14.03.2017.
  */
-public final class DBConnection {
+public final class MyConnectionPool {
     public static final Db db = new ConnectionPoolBuilder()
             .hostname("localhost")
             .port(5432)
