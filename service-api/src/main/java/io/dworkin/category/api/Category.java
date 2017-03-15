@@ -1,10 +1,9 @@
-package io.dwornik.category.api;
+package io.dworkin.category.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.annotation.concurrent.Immutable;
-import java.util.List;
 
 /**
  * Created by yakov on 14.03.2017.

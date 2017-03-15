@@ -1,4 +1,4 @@
-package io.dwornik.db;
+package io.dworkin.db;
 
 import com.github.pgasync.ConnectionPoolBuilder;
 import com.github.pgasync.Db;

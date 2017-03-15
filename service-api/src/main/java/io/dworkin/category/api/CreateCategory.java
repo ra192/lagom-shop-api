@@ -1,4 +1,4 @@
-package io.dwornik.category.api;
+package io.dworkin.category.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

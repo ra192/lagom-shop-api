@@ -1,6 +1,6 @@
-package io.dwornik.dao;
+package io.dworkin.dao;
 
-import io.dwornik.model.CategoryEntity;
+import io.dworkin.model.CategoryEntity;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

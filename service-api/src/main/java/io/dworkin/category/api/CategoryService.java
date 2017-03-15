@@ -1,4 +1,4 @@
-package io.dwornik.category.api;
+package io.dworkin.category.api;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.Descriptor;

@@ -1,11 +1,10 @@
-package io.dwornik.dao.impl;
+package io.dworkin.dao.impl;
 
 
-import io.dwornik.dao.CategoryDao;
-import io.dwornik.db.DBConnection;
-import io.dwornik.model.CategoryEntity;
+import io.dworkin.dao.CategoryDao;
+import io.dworkin.db.DBConnection;
+import io.dworkin.model.CategoryEntity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

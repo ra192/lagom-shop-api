@@ -1,10 +1,10 @@
-package io.dwornik.category.impl;
+package io.dworkin.category.impl;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
-import io.dwornik.category.api.Category;
-import io.dwornik.category.api.CategoryService;
-import io.dwornik.dao.CategoryDao;
+import io.dworkin.category.api.Category;
+import io.dworkin.category.api.CategoryService;
+import io.dworkin.dao.CategoryDao;
 
 import javax.inject.Inject;
 import java.util.List;

@@ -1,4 +1,4 @@
-package io.dwornik.model;
+package io.dworkin.model;
 
 /**
  * Created by yakov_000 on 16.03.2015.

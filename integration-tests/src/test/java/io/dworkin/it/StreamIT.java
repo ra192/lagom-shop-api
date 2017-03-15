@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016-2017 Lightbend Inc. <https://www.lightbend.com>
  */
-package io.dwornik.it;
+package io.dworkin.it;
 
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
@@ -12,7 +12,7 @@ import com.lightbend.lagom.javadsl.client.integration.LagomClientFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import io.dwornik.stream.api.StreamService;
+import io.dworkin.stream.api.StreamService;
 
 import java.net.URI;
 import java.util.Arrays;
