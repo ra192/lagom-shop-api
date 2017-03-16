@@ -5,10 +5,7 @@ import io.dworkin.dao.CategoryDao;
 import io.dworkin.db.MyConnectionPool;
 import io.dworkin.model.CategoryEntity;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -20,18 +17,18 @@ import java.util.stream.StreamSupport;
 public class CategoryDaoImpl implements CategoryDao {
 
     @Override
-    public CompletableFuture<CategoryEntity> getByName(String name) {
+    public CompletableFuture<Optional<CategoryEntity>> getByName(String name) {
 
-        final CompletableFuture<CategoryEntity> future = new CompletableFuture<>();
+        final CompletableFuture<Optional<CategoryEntity>> future = new CompletableFuture<>();
 
         MyConnectionPool.db.query("select * from category where name=$1", Arrays.asList(name), result -> {
             if (result.size() > 0) {
                 final CategoryEntity category = new CategoryEntity(result.row(0).getLong("id"), result.row(0).getString("name"),
                         result.row(0).getString("displayName"), result.row(0).getLong("parent_id"));
 
-                future.complete(category);
+                future.complete(Optional.of(category));
             } else {
-                future.completeExceptionally(new Exception("CategoryEntity with specified name doesn't exist"));
+                future.complete(Optional.empty());
             }
         }, future::completeExceptionally);
 
@@ -39,12 +36,12 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
-    public CompletableFuture<List<CategoryEntity>> listByParentId(Long parentId) {
+    public CompletableFuture<List<CategoryEntity>> listByParentId(Optional<Long> parentId) {
 
         final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
 
-        final String query = (parentId == 0) ? "select * from category where parent_id is null" :
-                "select * from category where parent_id = ".concat(parentId.toString());
+        final String query = (!parentId.isPresent()) ? "select * from category where parent_id is null" :
+                "select * from category where parent_id = ".concat(parentId.get().toString());
 
         MyConnectionPool.db.query(query,
                 result -> {

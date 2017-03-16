@@ -3,6 +3,7 @@ package io.dworkin.dao;
 import io.dworkin.model.CategoryEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -12,9 +13,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface CategoryDao {
 
-    CompletableFuture<CategoryEntity> getByName(String name);
+    CompletableFuture<Optional<CategoryEntity>> getByName(String name);
 
-    CompletableFuture<List<CategoryEntity>> listByParentId(Long parentId);
+    CompletableFuture<List<CategoryEntity>> listByParentId(Optional<Long> parentId);
 
     CompletableFuture<Long> create(CategoryEntity category);
 
