@@ -10,6 +10,7 @@ import io.dworkin.model.CategoryEntity;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -32,13 +33,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ServiceCall<NotUsed, List<Category>> listByParent(Optional<String> name) {
-        return notUsed -> {
-            if (!name.isPresent())
-                return categoryDao.listByParentId(Optional.empty()).thenApply(cats -> cats.stream().map(cat -> new Category(cat.getName(), cat.getDisplayName())).collect(Collectors.toList()));
-            else
-                return categoryDao.getByName(name.get()).thenComposeAsync(catOpt -> categoryDao.listByParentId(catOpt.map(CategoryEntity::getId))
-                        .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
-                                .collect(Collectors.toList())));
-        };
+        return notUsed -> name.map(nm -> categoryDao.getByName(nm).thenApply(itm -> itm.map(CategoryEntity::getId)))
+                .orElse(CompletableFuture.completedFuture(Optional.empty()))
+                .thenComposeAsync(categoryDao::listByParentId)
+                .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
+                        .collect(Collectors.toList()));
     }
 }
