@@ -25,4 +25,4 @@ public interface CategoryService extends Service {
                 pathCall("/api/category/list/:parentName",this::listByParent)
         ).withAutoAcl(true);
     }
-}                                                                                                                                                                                                                                                                                                                                                                                                       */8
+}
