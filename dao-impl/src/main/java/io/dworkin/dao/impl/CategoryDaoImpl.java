@@ -36,12 +36,12 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
-    public CompletableFuture<List<CategoryEntity>> listByParentId(Optional<Long> parentId) {
+    public CompletableFuture<List<CategoryEntity>> listByParentId(Long parentId) {
 
         final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
 
-        final String query = (!parentId.isPresent()) ? "select * from category where parent_id is null" :
-                "select * from category where parent_id = ".concat(parentId.get().toString());
+        final String query = (parentId==null) ? "select * from category where parent_id is null" :
+                "select * from category where parent_id = ".concat(parentId.toString());
 
         MyConnectionPool.db.query(query,
                 result -> {

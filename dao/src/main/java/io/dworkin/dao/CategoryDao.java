@@ -15,7 +15,7 @@ public interface CategoryDao {
 
     CompletableFuture<Optional<CategoryEntity>> getByName(String name);
 
-    CompletableFuture<List<CategoryEntity>> listByParentId(Optional<Long> parentId);
+    CompletableFuture<List<CategoryEntity>> listByParentId(Long parentId);
 
     CompletableFuture<Long> create(CategoryEntity category);
 

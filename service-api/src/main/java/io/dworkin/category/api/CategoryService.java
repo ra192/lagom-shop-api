@@ -16,7 +16,9 @@ public interface CategoryService extends Service {
 
     ServiceCall<NotUsed, Optional<Category>> getByName(String name);
 
-    ServiceCall<NotUsed, List<Category>> listByParent(Optional<String> name);
+    ServiceCall<NotUsed, List<Category>> listByParent(String name);
+
+    ServiceCall<CreateCategory, String> create();
 
     @Override
     default Descriptor descriptor() {

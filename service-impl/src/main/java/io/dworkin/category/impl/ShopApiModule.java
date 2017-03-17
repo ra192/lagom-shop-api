@@ -7,7 +7,9 @@ import com.google.inject.AbstractModule;
 import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import io.dworkin.category.api.CategoryService;
 import io.dworkin.dao.CategoryDao;
+import io.dworkin.dao.PropertyDao;
 import io.dworkin.dao.impl.CategoryDaoImpl;
+import io.dworkin.dao.impl.PropertyDaoImpl;
 
 /**
  * The module that binds the HelloService so that it can be served.
@@ -17,5 +19,6 @@ public class ShopApiModule extends AbstractModule implements ServiceGuiceSupport
     protected void configure() {
         bindServices(serviceBinding(CategoryService.class, CategoryServiceImpl.class));
         bind(CategoryDao.class).to(CategoryDaoImpl.class);
+        bind(PropertyDao.class).to(PropertyDaoImpl.class);
     }
 }

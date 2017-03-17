@@ -7,6 +7,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.concurrent.Immutable;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Create category request
@@ -20,11 +22,14 @@ public final class CreateCategory {
 
     public final String parent;
 
+    public final Set<String>properties;
+
     @JsonCreator
-    public CreateCategory(String name, String displayName, String parent) {
+    public CreateCategory(String name, String displayName, String parent, Set<String> properties) {
         this.name = Preconditions.checkNotNull(name);
         this.displayName = Preconditions.checkNotNull(displayName);
         this.parent = parent;
+        this.properties = properties;
     }
 
     @Override
@@ -32,9 +37,7 @@ public final class CreateCategory {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateCategory that = (CreateCategory) o;
-        return Objects.equal(name, that.name) &&
-                Objects.equal(displayName, that.displayName) &&
-                Objects.equal(parent, that.parent);
+        return Objects.equal(name, that.name);
     }
 
     @Override
@@ -48,6 +51,7 @@ public final class CreateCategory {
                 .add("name", name)
                 .add("displayName", displayName)
                 .add("parent", parent)
+                .add("properties",properties)
                 .toString();
     }
 }
