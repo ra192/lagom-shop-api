@@ -7,12 +7,20 @@ import com.github.pgasync.Db;
  * Created by yakov on 14.03.2017.
  */
 public final class MyConnectionPool {
-    public static final Db db = new ConnectionPoolBuilder()
-            .hostname("localhost")
-            .port(5432)
-            .database("myshop")
-            .username("myshop")
-            .password("myshop")
-            .poolSize(20)
-            .build();
+    private final Db db;
+
+    public MyConnectionPool(String hostname, int port, String database, String username, String password, int poolSize) {
+        db = new ConnectionPoolBuilder()
+                .hostname(hostname)
+                .port(port)
+                .database(database)
+                .username(username)
+                .password(password)
+                .poolSize(poolSize)
+                .build();
+    }
+
+    public Db getDb() {
+        return db;
+    }
 }

@@ -14,6 +14,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public class PropertyDaoImpl implements PropertyDao {
 
+    private final MyConnectionPool connectionPool;
+
+    public PropertyDaoImpl(MyConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
+    }
+
     @Override
     public CompletableFuture<Optional<PropertyEntity>> getByName(String name) {
 
@@ -21,7 +27,7 @@ public class PropertyDaoImpl implements PropertyDao {
 
         String query = "select * from property where name=$1";
 
-        MyConnectionPool.db.query(query, Arrays.asList(name), result -> {
+        connectionPool.getDb().query(query, Arrays.asList(name), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(new PropertyEntity(result.row(0).getLong("id"),
                         result.row(0).getString("name"), result.row(0).getString("displayName"))));
@@ -37,10 +43,10 @@ public class PropertyDaoImpl implements PropertyDao {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
-        MyConnectionPool.db.query("select nextval('hibernate_sequence')", idRes -> {
+        connectionPool.getDb().query("select nextval('hibernate_sequence')", idRes -> {
             final Long id = idRes.row(0).getLong(0);
             String query = "INSERT INTO property(id, displayname, name) VALUES ($1, $2, $3)";
-            MyConnectionPool.db.query(query, Arrays.asList(id, property.getDisplayName(), property.getName()),
+            connectionPool.getDb().query(query, Arrays.asList(id, property.getDisplayName(), property.getName()),
                     res -> future.complete(id), future::completeExceptionally);
         }, future::completeExceptionally);
 
@@ -53,7 +59,7 @@ public class PropertyDaoImpl implements PropertyDao {
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
         String query = "UPDATE property SET displayname=$1, name=$2 WHERE id=$1";
-        MyConnectionPool.db.query(query, Arrays.asList(property.getId(), property.getDisplayName(), property.getName()),
+        connectionPool.getDb().query(query, Arrays.asList(property.getId(), property.getDisplayName(), property.getName()),
                 res -> future.complete(1L), future::completeExceptionally);
 
         return future;

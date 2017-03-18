@@ -5,7 +5,11 @@ import io.dworkin.dao.CategoryDao;
 import io.dworkin.db.MyConnectionPool;
 import io.dworkin.model.CategoryEntity;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -16,12 +20,18 @@ import java.util.stream.StreamSupport;
  */
 public class CategoryDaoImpl implements CategoryDao {
 
+    private final MyConnectionPool connectionPool;
+
+    public CategoryDaoImpl(MyConnectionPool connectionPool) {
+        this.connectionPool = connectionPool;
+    }
+
     @Override
     public CompletableFuture<Optional<CategoryEntity>> getByName(String name) {
 
         final CompletableFuture<Optional<CategoryEntity>> future = new CompletableFuture<>();
 
-        MyConnectionPool.db.query("select * from category where name=$1", Arrays.asList(name), result -> {
+        connectionPool.getDb().query("select * from category where name=$1", Arrays.asList(name), result -> {
             if (result.size() > 0) {
                 final CategoryEntity category = new CategoryEntity(result.row(0).getLong("id"), result.row(0).getString("name"),
                         result.row(0).getString("displayName"), result.row(0).getLong("parent_id"));
@@ -43,7 +53,7 @@ public class CategoryDaoImpl implements CategoryDao {
         final String query = (parentId==null) ? "select * from category where parent_id is null" :
                 "select * from category where parent_id = ".concat(parentId.toString());
 
-        MyConnectionPool.db.query(query,
+        connectionPool.getDb().query(query,
                 result -> {
                     final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
                             .map(row -> new CategoryEntity(row.getLong("id"), row.getString("name"),
@@ -61,12 +71,12 @@ public class CategoryDaoImpl implements CategoryDao {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
-        MyConnectionPool.db.query("select nextval('category_id_seq')", idResult -> {
+        connectionPool.getDb().query("select nextval('category_id_seq')", idResult -> {
             final Long id = idResult.row(0).getLong(0);
 
             String query = "INSERT INTO category(id, displayname, name, parent_id) VALUES ($1, $2, $3, $4);";
 
-            MyConnectionPool.db.query(query, Arrays.asList(id, category.getDisplayName(), category.getName(), category.getParentId()),
+            connectionPool.getDb().query(query, Arrays.asList(id, category.getDisplayName(), category.getName(), category.getParentId()),
                     result -> future.complete(id), future::completeExceptionally);
         }, future::completeExceptionally);
 
@@ -80,7 +90,7 @@ public class CategoryDaoImpl implements CategoryDao {
 
         String query = "UPDATE category SET displayname=$2, name=$3, parent_id=$4 WHERE id=$1";
 
-        MyConnectionPool.db.query(query, Arrays.asList(category.getId(), category.getDisplayName(), category.getName(), category.getParentId()),
+        connectionPool.getDb().query(query, Arrays.asList(category.getId(), category.getDisplayName(), category.getName(), category.getParentId()),
                 result -> future.complete(true), future::completeExceptionally);
 
         return future;
@@ -106,7 +116,7 @@ public class CategoryDaoImpl implements CategoryDao {
             }
         }
 
-        MyConnectionPool.db.query(queryBuilder.toString(), result -> future.complete(true), future::completeExceptionally);
+        connectionPool.getDb().query(queryBuilder.toString(), result -> future.complete(true), future::completeExceptionally);
 
         return future;
     }
