@@ -2,24 +2,18 @@ package io.dworkin.category.impl;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
-import com.typesafe.conductr.lib.java.Tuple;
 import io.dworkin.category.api.Category;
 import io.dworkin.category.api.CategoryService;
-import io.dworkin.category.api.CreateCategory;
+import io.dworkin.category.api.CategoryRequest;
 import io.dworkin.dao.CategoryDao;
 import io.dworkin.dao.PropertyDao;
 import io.dworkin.model.CategoryEntity;
-import io.dworkin.model.PropertyEntity;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
-import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 /**
  * {@link CategoryService} implementation
@@ -43,35 +37,29 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ServiceCall<NotUsed, List<Category>> listByParent(String name) {
-        return notUsed -> categoryDao.getByName(name).thenApply(catOpt -> catOpt.map(CategoryEntity::getId).orElse(null))
-                .thenComposeAsync(categoryDao::listByParentId)
+    public ServiceCall<NotUsed, List<Category>> listRoots() {
+        return notUsed -> categoryDao.listRoots()
                 .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
                         .collect(toList()));
     }
 
     @Override
-    public ServiceCall<CreateCategory, String> create() {
-        return createRequest -> {
-            final CompletableFuture<Long> parentFuture = categoryDao.getByName(createRequest.parent)
-                    .thenApply(catOpt -> catOpt.map(CategoryEntity::getId).orElse(null));
+    public ServiceCall<NotUsed, List<Category>> listByParent(String name) {
+        return notUsed -> categoryDao.listByParentName(name)
+                .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
+                        .collect(toList()));
+    }
 
-            final List<CompletableFuture<Optional<Long>>> propertyFuturesList = createRequest.properties.stream()
-                    .map(nm -> propertyDao.getByName(nm).thenApply(propOpt -> propOpt.map(PropertyEntity::getId))).collect(toList());
-            final CompletableFuture<Set<Optional<Long>>> propertyIdsFuture = allOf(propertyFuturesList.toArray(
-                    new CompletableFuture[propertyFuturesList.size()]))
-                    .thenApply(v -> propertyFuturesList.stream().map(CompletableFuture::join).collect(toSet()));
+    @Override
+    public ServiceCall<CategoryRequest, String> create() {
+        return createRequest -> categoryDao.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
+                createRequest.properties).thenApply(res -> "ok");
+    }
 
-            final CompletableFuture<Tuple<Long, Set<Long>>> parentAndPropsFuture = parentFuture
-                    .thenCombine(propertyIdsFuture, (parentId, propOptIds) -> {
-                final Set<Long> popIds = propOptIds.stream().filter(Optional::isPresent).map(Optional::get).collect(toSet());
-                return new Tuple<>(parentId, popIds);
-            });
-
-            return parentAndPropsFuture.thenComposeAsync(pair -> categoryDao.create(
-                    new CategoryEntity(null, createRequest.name, createRequest.displayName, pair._1))
-                    .thenComposeAsync(id -> categoryDao.updateProperties(id, pair._2)).thenApply(res -> "ok"));
-        };
+    @Override
+    public ServiceCall<CategoryRequest, String> update() {
+        return createRequest -> categoryDao.update(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
+                createRequest.properties).thenApply(res -> "ok");
     }
 }
 

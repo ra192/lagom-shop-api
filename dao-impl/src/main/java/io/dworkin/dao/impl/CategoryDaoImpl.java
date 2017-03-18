@@ -33,8 +33,8 @@ public class CategoryDaoImpl implements CategoryDao {
 
         connectionPool.getDb().query("select * from category where name=$1", Arrays.asList(name), result -> {
             if (result.size() > 0) {
-                final CategoryEntity category = new CategoryEntity(result.row(0).getLong("id"), result.row(0).getString("name"),
-                        result.row(0).getString("displayName"), result.row(0).getLong("parent_id"));
+                final CategoryEntity category = new CategoryEntity(result.row(0).getString("name"),
+                        result.row(0).getString("displayName"));
 
                 future.complete(Optional.of(category));
             } else {
@@ -46,18 +46,16 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
-    public CompletableFuture<List<CategoryEntity>> listByParentId(Long parentId) {
-
+    public CompletableFuture<List<CategoryEntity>> listRoots() {
         final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
 
-        final String query = (parentId==null) ? "select * from category where parent_id is null" :
-                "select * from category where parent_id = ".concat(parentId.toString());
+        final String query = "select * from category where parent_id is null";
 
         connectionPool.getDb().query(query,
                 result -> {
                     final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
-                            .map(row -> new CategoryEntity(row.getLong("id"), row.getString("name"),
-                                    row.getString("displayname"), row.getLong("parent_id"))).collect(Collectors.toList());
+                            .map(row -> new CategoryEntity(row.getString("name"), row.getString("displayname")))
+                            .collect(Collectors.toList());
 
                     future.complete(categories);
                 },
@@ -67,48 +65,68 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
-    public CompletableFuture<Long> create(CategoryEntity category) {
+    public CompletableFuture<List<CategoryEntity>> listByParentName(String name) {
+
+        final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
+
+        final String query = "select * from category where parent_id = (select id from category where name=$1)";
+
+        connectionPool.getDb().query(query, Arrays.asList(name),
+                result -> {
+                    final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
+                            .map(row -> new CategoryEntity(row.getString("name"), row.getString("displayname")))
+                            .collect(Collectors.toList());
+
+                    future.complete(categories);
+                },
+                future::completeExceptionally);
+
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Long> create(CategoryEntity category, String parentName, Set<String> propertyNames) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
-        connectionPool.getDb().query("select nextval('category_id_seq')", idResult -> {
-            final Long id = idResult.row(0).getLong(0);
 
-            String query = "INSERT INTO category(id, displayname, name, parent_id) VALUES ($1, $2, $3, $4);";
+        String query = "INSERT INTO category(id, displayname, name, parent_id) VALUES (nextval('category_id_seq'), $1, $2, (select id from category where name = $3));";
 
-            connectionPool.getDb().query(query, Arrays.asList(id, category.getDisplayName(), category.getName(), category.getParentId()),
-                    result -> future.complete(id), future::completeExceptionally);
-        }, future::completeExceptionally);
+        connectionPool.getDb().query(query, Arrays.asList(category.getDisplayName(), category.getName(), parentName),
+                result -> connectionPool.getDb().query(updatePropertiesQuery(category.getName(), propertyNames),
+                        res -> future.complete(1L), future::completeExceptionally), future::completeExceptionally);
 
         return future;
     }
 
     @Override
-    public CompletableFuture<Boolean> update(CategoryEntity category) {
+    public CompletableFuture<Boolean> update(CategoryEntity category, String parentName, Set<String> propertyNames) {
 
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
 
-        String query = "UPDATE category SET displayname=$2, name=$3, parent_id=$4 WHERE id=$1";
+        String query = "UPDATE category SET displayname=$2, parent_id=(select id from category where name=$3) WHERE name=$1;";
 
-        connectionPool.getDb().query(query, Arrays.asList(category.getId(), category.getDisplayName(), category.getName(), category.getParentId()),
-                result -> future.complete(true), future::completeExceptionally);
+        connectionPool.getDb().query(query, Arrays.asList(category.getName(), category.getDisplayName(), parentName),
+                result -> connectionPool.getDb().query(updatePropertiesQuery(category.getName(), propertyNames),
+                        res -> future.complete(true), future::completeExceptionally), future::completeExceptionally);
 
         return future;
     }
 
-    @Override
-    public CompletableFuture<Boolean> updateProperties(Long id, Set<Long> propertyIds) {
+    private String updatePropertiesQuery(String name, Set<String> propertyNames) {
 
-        final CompletableFuture<Boolean> future = new CompletableFuture<>();
 
-        final StringBuilder queryBuilder = new StringBuilder("delete from category_property where category_id=").append(id).append(";");
+        final StringBuilder queryBuilder = new StringBuilder(
+                "delete from category_property where category_id=(select id from category where name='")
+                .append(name).append("');");
 
-        if (!propertyIds.isEmpty()) {
+        if (!propertyNames.isEmpty()) {
             queryBuilder.append("INSERT INTO category_property(category_id, properties_id) VALUES");
-            final Iterator<Long> iterator = propertyIds.iterator();
+            final Iterator<String> iterator = propertyNames.iterator();
             while (iterator.hasNext()) {
-                final Long propertyId = iterator.next();
-                queryBuilder.append(" (").append(id).append(", ").append(propertyId).append(")");
+                final String propertyName = iterator.next();
+                queryBuilder.append(" ((select id from category where name='").append(name)
+                        .append("'), (select id from property where name='").append(propertyName).append("'))");
                 if (iterator.hasNext())
                     queryBuilder.append(", ");
                 else
@@ -116,8 +134,6 @@ public class CategoryDaoImpl implements CategoryDao {
             }
         }
 
-        connectionPool.getDb().query(queryBuilder.toString(), result -> future.complete(true), future::completeExceptionally);
-
-        return future;
+        return queryBuilder.toString();
     }
 }

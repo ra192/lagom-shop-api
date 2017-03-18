@@ -15,11 +15,11 @@ public interface CategoryDao {
 
     CompletableFuture<Optional<CategoryEntity>> getByName(String name);
 
-    CompletableFuture<List<CategoryEntity>> listByParentId(Long parentId);
+    CompletableFuture<List<CategoryEntity>> listRoots();
 
-    CompletableFuture<Long> create(CategoryEntity category);
+    CompletableFuture<List<CategoryEntity>> listByParentName(String name);
 
-    CompletableFuture<Boolean> update(CategoryEntity category);
+    CompletableFuture<Long> create(CategoryEntity category, String parentName, Set<String> propertyNames);
 
-    CompletableFuture<Boolean> updateProperties(Long id, Set<Long> propertyIds);
+    CompletableFuture<Boolean> update(CategoryEntity category, String parentName, Set<String> propertyNames);
 }

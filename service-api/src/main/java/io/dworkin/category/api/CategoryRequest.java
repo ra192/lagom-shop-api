@@ -7,7 +7,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.concurrent.Immutable;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -16,7 +15,7 @@ import java.util.Set;
  */
 @Immutable
 @JsonDeserialize
-public final class CreateCategory {
+public final class CategoryRequest {
     public final String name;
     public final String displayName;
 
@@ -25,7 +24,7 @@ public final class CreateCategory {
     public final Set<String>properties;
 
     @JsonCreator
-    public CreateCategory(String name, String displayName, String parent, Set<String> properties) {
+    public CategoryRequest(String name, String displayName, String parent, Set<String> properties) {
         this.name = Preconditions.checkNotNull(name);
         this.displayName = Preconditions.checkNotNull(displayName);
         this.parent = parent;
@@ -36,7 +35,7 @@ public final class CreateCategory {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CreateCategory that = (CreateCategory) o;
+        CategoryRequest that = (CategoryRequest) o;
         return Objects.equal(name, that.name);
     }
 

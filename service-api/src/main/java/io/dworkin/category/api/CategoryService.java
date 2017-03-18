@@ -16,6 +16,8 @@ public interface CategoryService extends Service {
 
     ServiceCall<NotUsed, Optional<Category>> getByName(String name);
 
+    ServiceCall<NotUsed, List<Category>> listRoots();
+
     ServiceCall<NotUsed, List<Category>> listByParent(String name);
 
     /**
@@ -23,14 +25,17 @@ public interface CategoryService extends Service {
      *
      * @return
      */
-    ServiceCall<CreateCategory, String> create();
+    ServiceCall<CategoryRequest, String> create();
 
     @Override
     default Descriptor descriptor() {
         return named("category").withCalls(
                 pathCall("/api/category/get/:name", this::getByName),
+                pathCall("/api/category/list", this::listRoots),
                 pathCall("/api/category/list/:parentName", this::listByParent),
                 pathCall("/api/category/create", this::create)
         ).withAutoAcl(true);
     }
+
+    ServiceCall<CategoryRequest, String> update();
 }
