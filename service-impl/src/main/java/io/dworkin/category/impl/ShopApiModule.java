@@ -6,6 +6,8 @@ package io.dworkin.category.impl;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import io.dworkin.category.api.CategoryService;
 import io.dworkin.dao.CategoryDao;
 import io.dworkin.dao.PropertyDao;
@@ -23,8 +25,9 @@ public class ShopApiModule extends AbstractModule implements ServiceGuiceSupport
     }
 
     @Provides
-    MyConnectionPool provideMyConnectionPool() {
-        return new MyConnectionPool("localhost",5432,"myshop","myshop","myshop",20);
+    MyConnectionPool provideMyConnectionPool(Config config) {
+        return new MyConnectionPool(config.getString("db.host"),config.getInt("db.port"),config.getString("db.name"),
+                config.getString("db.user"),config.getString("db.password"),config.getInt("db.poolSize"));
     }
 
     @Provides
@@ -35,5 +38,10 @@ public class ShopApiModule extends AbstractModule implements ServiceGuiceSupport
     @Provides
     CategoryDao provideCategoryDao(MyConnectionPool connectionPool) {
         return new CategoryDaoImpl(connectionPool);
+    }
+
+    @Provides
+    Config provideConfig() {
+        return ConfigFactory.load();
     }
 }
