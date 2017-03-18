@@ -27,15 +27,16 @@ public interface CategoryService extends Service {
      */
     ServiceCall<CategoryRequest, String> create();
 
+    ServiceCall<CategoryRequest, String> update();
+
     @Override
     default Descriptor descriptor() {
         return named("category").withCalls(
                 pathCall("/api/category/get/:name", this::getByName),
                 pathCall("/api/category/list", this::listRoots),
                 pathCall("/api/category/list/:parentName", this::listByParent),
-                pathCall("/api/category/create", this::create)
+                pathCall("/api/category/create", this::create),
+                pathCall("/api/category/update", this::update)
         ).withAutoAcl(true);
     }
-
-    ServiceCall<CategoryRequest, String> update();
 }
