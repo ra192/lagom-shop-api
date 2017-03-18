@@ -53,21 +53,24 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ServiceCall<CreateCategory, String> create() {
         return createRequest -> {
-            final CompletableFuture<Long> createFuture = categoryDao.getByName(createRequest.parent)
-                    .thenApply(catOpt -> catOpt.map(CategoryEntity::getId).orElse(null))
-                    .thenComposeAsync(parentId -> categoryDao.create(new CategoryEntity(null, createRequest.name,
-                            createRequest.displayName, parentId)));
+            final CompletableFuture<Long> parentFuture = categoryDao.getByName(createRequest.parent)
+                    .thenApply(catOpt -> catOpt.map(CategoryEntity::getId).orElse(null));
 
             final List<CompletableFuture<Optional<Long>>> propertyFuturesList = createRequest.properties.stream()
                     .map(nm -> propertyDao.getByName(nm).thenApply(propOpt -> propOpt.map(PropertyEntity::getId))).collect(toList());
-            CompletableFuture<Set<Optional<Long>>> propertyIdsFuture = allOf(propertyFuturesList.toArray(
+            final CompletableFuture<Set<Optional<Long>>> propertyIdsFuture = allOf(propertyFuturesList.toArray(
                     new CompletableFuture[propertyFuturesList.size()]))
                     .thenApply(v -> propertyFuturesList.stream().map(CompletableFuture::join).collect(toSet()));
 
-            return createFuture.thenCombine(propertyIdsFuture, (id, propOptIds) -> {
+            final CompletableFuture<Tuple<Long, Set<Long>>> parentAndPropsFuture = parentFuture
+                    .thenCombine(propertyIdsFuture, (parentId, propOptIds) -> {
                 final Set<Long> popIds = propOptIds.stream().filter(Optional::isPresent).map(Optional::get).collect(toSet());
-                return new Tuple<>(id, popIds);
-            }).thenComposeAsync(pair -> categoryDao.updateProperties(pair._1, pair._2)).thenApply(res -> "ok");
+                return new Tuple<>(parentId, popIds);
+            });
+
+            return parentAndPropsFuture.thenComposeAsync(pair -> categoryDao.create(
+                    new CategoryEntity(null, createRequest.name, createRequest.displayName, pair._1))
+                    .thenComposeAsync(id -> categoryDao.updateProperties(id, pair._2)).thenApply(res -> "ok"));
         };
     }
 }
