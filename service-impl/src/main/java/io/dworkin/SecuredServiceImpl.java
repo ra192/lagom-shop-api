@@ -3,7 +3,6 @@ package io.dworkin;
 import com.lightbend.lagom.javadsl.api.transport.Forbidden;
 import io.dworkin.dao.UserDao;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -17,8 +16,7 @@ public abstract class SecuredServiceImpl {
 
     private final UserDao userDao;
 
-    @Inject
-    public SecuredServiceImpl(UserDao userDao) {
+    protected SecuredServiceImpl(UserDao userDao) {
         this.userDao = userDao;
     }
 
