@@ -26,7 +26,7 @@ public class UserDaoImpl implements UserDao {
     public CompletableFuture<Optional<UserEntity>> getByName(String username) {
         final CompletableFuture<Optional<UserEntity>> future = new CompletableFuture<>();
 
-        final String query = "select * from user where username=$1";
+        final String query = "select * from \"user\" where username=$1";
 
         connectionPool.getDb().query(query, Arrays.asList(username), result -> {
             if (result.size() > 0)
@@ -41,7 +41,7 @@ public class UserDaoImpl implements UserDao {
     public CompletableFuture<List<String>> getRoles(String username) {
         CompletableFuture<List<String>> future = new CompletableFuture<>();
 
-        final String query = "select role from user_role where user_id=(select id from user where name=$1)";
+        final String query = "select role from user_role where user_id=(select id from \"user\" where username=$1)";
         connectionPool.getDb().query(query, Arrays.asList(username), result ->
                 future.complete(StreamSupport.stream(result.spliterator(), false)
                         .map(row -> row.getString("role")).collect(toList())), future::completeExceptionally);

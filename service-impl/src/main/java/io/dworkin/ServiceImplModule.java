@@ -13,9 +13,11 @@ import io.dworkin.category.impl.CategoryServiceImpl;
 import io.dworkin.dao.CategoryDao;
 import io.dworkin.dao.ProductDao;
 import io.dworkin.dao.PropertyDao;
+import io.dworkin.dao.UserDao;
 import io.dworkin.dao.impl.CategoryDaoImpl;
 import io.dworkin.dao.impl.ProductDaoImpl;
 import io.dworkin.dao.impl.PropertyDaoImpl;
+import io.dworkin.dao.impl.UserDaoImpl;
 import io.dworkin.db.MyConnectionPool;
 import io.dworkin.product.api.ProductService;
 import io.dworkin.product.impl.ProductServiceImpl;
@@ -26,8 +28,10 @@ import io.dworkin.product.impl.ProductServiceImpl;
 public class ServiceImplModule extends AbstractModule implements ServiceGuiceSupport {
     @Override
     protected void configure() {
-        bindServices(serviceBinding(CategoryService.class, CategoryServiceImpl.class),
-                serviceBinding(ProductService.class,ProductServiceImpl.class));
+        bindServices(
+                serviceBinding(CategoryService.class, CategoryServiceImpl.class),
+                serviceBinding(ProductService.class,ProductServiceImpl.class)
+        );
     }
 
     @Provides
@@ -54,5 +58,10 @@ public class ServiceImplModule extends AbstractModule implements ServiceGuiceSup
     @Provides
     ProductDao provideProductDao(MyConnectionPool connectionPool) {
         return new ProductDaoImpl(connectionPool);
+    }
+
+    @Provides
+    UserDao provideUserDao(MyConnectionPool connectionPool) {
+        return new UserDaoImpl(connectionPool);
     }
 }

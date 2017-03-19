@@ -23,12 +23,15 @@ public final class CategoryRequest {
 
     public final Set<String>properties;
 
+    public final String token;
+
     @JsonCreator
-    public CategoryRequest(String name, String displayName, String parent, Set<String> properties) {
+    public CategoryRequest(String name, String displayName, String parent, Set<String> properties, String token) {
         this.name = Preconditions.checkNotNull(name);
         this.displayName = Preconditions.checkNotNull(displayName);
         this.parent = parent;
         this.properties = properties;
+        this.token = token;
     }
 
     @Override

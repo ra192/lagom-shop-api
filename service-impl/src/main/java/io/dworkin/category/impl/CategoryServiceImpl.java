@@ -2,28 +2,32 @@ package io.dworkin.category.impl;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
+import io.dworkin.SecuredServiceImpl;
 import io.dworkin.category.api.Category;
 import io.dworkin.category.api.CategoryRequest;
 import io.dworkin.category.api.CategoryService;
 import io.dworkin.dao.CategoryDao;
+import io.dworkin.dao.UserDao;
 import io.dworkin.model.CategoryEntity;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 /**
  * {@link CategoryService} implementation
  * Created by yakov on 14.03.2017.
  */
-public class CategoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryService {
 
     private final CategoryDao categoryDao;
 
     @Inject
-    public CategoryServiceImpl(CategoryDao categoryDao) {
+    public CategoryServiceImpl(CategoryDao categoryDao, UserDao userDao) {
+        super(userDao);
         this.categoryDao = categoryDao;
     }
 
@@ -49,8 +53,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ServiceCall<CategoryRequest, String> create() {
-        return createRequest -> categoryDao.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
-                createRequest.properties).thenApply(res -> "ok");
+        return createRequest -> authorized(createRequest.token, singletonList("category-management"), () ->
+                categoryDao.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
+                        createRequest.properties).thenApply(res -> "ok"));
     }
 
     @Override
