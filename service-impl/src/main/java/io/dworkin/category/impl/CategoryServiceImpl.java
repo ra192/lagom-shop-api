@@ -3,10 +3,9 @@ package io.dworkin.category.impl;
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import io.dworkin.category.api.Category;
-import io.dworkin.category.api.CategoryService;
 import io.dworkin.category.api.CategoryRequest;
+import io.dworkin.category.api.CategoryService;
 import io.dworkin.dao.CategoryDao;
-import io.dworkin.dao.PropertyDao;
 import io.dworkin.model.CategoryEntity;
 
 import javax.inject.Inject;
@@ -22,12 +21,10 @@ import static java.util.stream.Collectors.toList;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryDao categoryDao;
-    private final PropertyDao propertyDao;
 
     @Inject
-    public CategoryServiceImpl(CategoryDao categoryDao, PropertyDao propertyDao) {
+    public CategoryServiceImpl(CategoryDao categoryDao) {
         this.categoryDao = categoryDao;
-        this.propertyDao = propertyDao;
     }
 
     @Override
