@@ -21,9 +21,10 @@ public interface CategoryService extends Service {
     ServiceCall<NotUsed, List<Category>> listByParent(String name);
 
     /**
+     * Create category
      * Example: curl -X POST -H "Content-Type:application/json" -d '{"name":"test1", "displayName":"test1", "parent":"pc_parts", "properties":["manufacturer","socket"]}' http://localhost:9000/api/category/create
      *
-     * @return
+     * @return ok if success
      */
     ServiceCall<CategoryRequest, String> create();
 

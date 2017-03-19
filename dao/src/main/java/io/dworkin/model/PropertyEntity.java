@@ -5,22 +5,12 @@ package io.dworkin.model;
  */
 public class PropertyEntity {
 
-    private Long id;
     private String name;
     private String displayName;
 
-    public PropertyEntity(Long id, String name, String displayName) {
-        this.id = id;
+    public PropertyEntity(String name, String displayName) {
         this.name = name;
         this.displayName = displayName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

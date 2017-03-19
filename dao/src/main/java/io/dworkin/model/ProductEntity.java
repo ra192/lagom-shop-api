@@ -5,26 +5,18 @@ package io.dworkin.model;
  */
 public class ProductEntity {
 
-    private Long id;
     private String code;
     private String displayName;
     private Double price;
     private String description;
     private String imageUrl;
-    private Long categoryId;
 
-    public ProductEntity(Long id, String code, String displayName, Double price, String description, String imageUrl, Long categoryId) {
-        this.id = id;
+    public ProductEntity(String code, String displayName, Double price, String description, String imageUrl) {
         this.code = code;
         this.displayName = displayName;
         this.price = price;
         this.description = description;
         this.imageUrl = imageUrl;
-        this.categoryId = categoryId;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getCode() {
@@ -47,14 +39,6 @@ public class ProductEntity {
         return imageUrl;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setCode(String code) {
         this.code = code;
     }
@@ -73,9 +57,5 @@ public class ProductEntity {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
     }
 }
