@@ -2,7 +2,6 @@ package io.dworkin.product.impl;
 
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
-import io.dworkin.dao.ProductDao;
 import io.dworkin.product.api.ListFilteredRequest;
 import io.dworkin.product.api.Product;
 import io.dworkin.product.api.ProductService;
@@ -18,12 +17,12 @@ import static java.util.stream.Collectors.toList;
  */
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductDao productDao;
+    private final ProductRepository productRepository;
     private final Config config;
 
     @Inject
-    public ProductServiceImpl(ProductDao productDao, Config config) {
-        this.productDao = productDao;
+    public ProductServiceImpl(ProductRepository productRepository, Config config) {
+        this.productRepository = productRepository;
         this.config = config;
     }
 
@@ -36,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
             final String orderBy = (request.orderBy != null) ? request.orderBy : "displayName";
             final Boolean isAsk = (request.isAsc != null) ? request.isAsc : true;
 
-            return productDao.listByCategoryNameAndPropertyValues(request.category, request.properties, first, max, orderBy, isAsk)
+            return productRepository.listByCategoryNameAndPropertyValues(request.category, request.properties, first, max, orderBy, isAsk)
                     .thenApply(products -> products.stream().map(itm ->
                             new Product(itm.getCode(), itm.getDisplayName(), itm.getPrice(), itm.getDescription(), itm.getImageUrl()))
                             .collect(toList()));

@@ -13,8 +13,6 @@
         <module>service-api</module>
         <module>service-impl</module>
         <module>integration-tests</module>
-        <module>dao</module>
-        <module>dao-impl</module>
     </modules>
 
     <build>

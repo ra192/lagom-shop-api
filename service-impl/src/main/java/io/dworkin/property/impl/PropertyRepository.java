@@ -1,27 +1,25 @@
-package io.dworkin.dao.impl;
+package io.dworkin.property.impl;
 
-import io.dworkin.dao.PropertyDao;
 import io.dworkin.db.MyConnectionPool;
-import io.dworkin.model.PropertyEntity;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
- * {@link PropertyDao} implementation using pgasynk
+ * Property repository using pgasynk
  * Created by yakov on 17.03.2017.
  */
-public class PropertyDaoImpl implements PropertyDao {
+public class PropertyRepository {
 
     private final MyConnectionPool connectionPool;
 
-    public PropertyDaoImpl(MyConnectionPool connectionPool) {
+    public PropertyRepository(MyConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
-    @Override
-    public CompletableFuture<Optional<PropertyEntity>> getByName(String name) {
+    public CompletionStage<Optional<PropertyEntity>> getByName(String name) {
 
         final CompletableFuture<Optional<PropertyEntity>> future = new CompletableFuture<>();
 
@@ -38,8 +36,7 @@ public class PropertyDaoImpl implements PropertyDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<Long> create(PropertyEntity property) {
+    public CompletionStage<Long> create(PropertyEntity property) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
@@ -50,8 +47,7 @@ public class PropertyDaoImpl implements PropertyDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<Long> update(PropertyEntity property) {
+    public CompletionStage<Long> update(PropertyEntity property) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 

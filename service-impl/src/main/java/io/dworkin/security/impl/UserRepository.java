@@ -1,13 +1,12 @@
-package io.dworkin.dao.impl;
+package io.dworkin.security.impl;
 
-import io.dworkin.dao.UserDao;
 import io.dworkin.db.MyConnectionPool;
-import io.dworkin.model.UserEntity;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -15,15 +14,14 @@ import static java.util.stream.Collectors.toList;
 /**
  * Created by yakov on 19.03.2017.
  */
-public class UserDaoImpl implements UserDao {
+public class UserRepository {
     private final MyConnectionPool connectionPool;
 
-    public UserDaoImpl(MyConnectionPool connectionPool) {
+    public UserRepository(MyConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
-    @Override
-    public CompletableFuture<Optional<UserEntity>> getByName(String username) {
+    public CompletionStage<Optional<UserEntity>> getByName(String username) {
         final CompletableFuture<Optional<UserEntity>> future = new CompletableFuture<>();
 
         final String query = "select * from \"user\" where username=$1";
@@ -37,8 +35,7 @@ public class UserDaoImpl implements UserDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<List<String>> getRoles(String username) {
+    public CompletionStage<List<String>> getRoles(String username) {
         CompletableFuture<List<String>> future = new CompletableFuture<>();
 
         final String query = "select role from user_role where user_id=(select id from \"user\" where username=$1)";

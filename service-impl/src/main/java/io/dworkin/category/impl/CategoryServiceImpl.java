@@ -2,13 +2,11 @@ package io.dworkin.category.impl;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
-import io.dworkin.SecuredServiceImpl;
+import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.category.api.Category;
 import io.dworkin.category.api.CategoryRequest;
 import io.dworkin.category.api.CategoryService;
-import io.dworkin.dao.CategoryDao;
-import io.dworkin.dao.UserDao;
-import io.dworkin.model.CategoryEntity;
+import io.dworkin.security.impl.UserRepository;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -23,30 +21,30 @@ import static java.util.stream.Collectors.toList;
  */
 public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryService {
 
-    private final CategoryDao categoryDao;
+    private final CategoryRepository categoryRepository;
 
     @Inject
-    public CategoryServiceImpl(CategoryDao categoryDao, UserDao userDao) {
-        super(userDao);
-        this.categoryDao = categoryDao;
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
+        super(userRepository);
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public ServiceCall<NotUsed, Optional<Category>> getByName(String name) {
-        return notUsed -> categoryDao.getByName(name).thenApply(catOpt -> catOpt.map(cat ->
+        return notUsed -> categoryRepository.getByName(name).thenApply(catOpt -> catOpt.map(cat ->
                 new Category(cat.getName(), cat.getDisplayName())));
     }
 
     @Override
     public ServiceCall<NotUsed, List<Category>> listRoots() {
-        return notUsed -> categoryDao.listRoots()
+        return notUsed -> categoryRepository.listRoots()
                 .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
                         .collect(toList()));
     }
 
     @Override
     public ServiceCall<NotUsed, List<Category>> listByParent(String name) {
-        return notUsed -> categoryDao.listByParentName(name)
+        return notUsed -> categoryRepository.listByParentName(name)
                 .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
                         .collect(toList()));
     }
@@ -54,14 +52,14 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
     @Override
     public ServiceCall<CategoryRequest, String> create() {
         return authorized(singletonList("category-management"), createRequest ->
-                categoryDao.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
+                categoryRepository.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
                         createRequest.properties).thenApply(res -> "ok"));
     }
 
     @Override
     public ServiceCall<CategoryRequest, String> update() {
         return authorized(singletonList("category-management"), createRequest ->
-                categoryDao.update(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
+                categoryRepository.update(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
                         createRequest.properties).thenApply(res -> "ok"));
     }
 }

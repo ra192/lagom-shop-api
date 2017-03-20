@@ -1,26 +1,24 @@
-package io.dworkin;
+package io.dworkin.security.impl;
 
 import com.lightbend.lagom.javadsl.api.transport.Forbidden;
 import com.lightbend.lagom.javadsl.server.HeaderServiceCall;
 import com.lightbend.lagom.javadsl.server.ServerServiceCall;
-import io.dworkin.dao.UserDao;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by yakov on 19.03.2017.
  */
 public abstract class SecuredServiceImpl {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    protected SecuredServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    protected SecuredServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     protected <Request, Response> ServerServiceCall<Request, Response> authenticated(Function<String, ServerServiceCall<Request, Response>> authCall) {
@@ -41,7 +39,7 @@ public abstract class SecuredServiceImpl {
     }
 
     protected <Request, Response> ServerServiceCall<Request, Response> authorized(List<String> allowedRoles, ServerServiceCall<Request, Response> authCall) {
-        return authenticated(username-> request->userDao.getRoles(username).thenCompose(roles -> {
+        return authenticated(username-> request->userRepository.getRoles(username).thenCompose(roles -> {
             if(roles.containsAll(allowedRoles))
             return authCall.invoke(request);
             else throw new Forbidden("Permissions denied");

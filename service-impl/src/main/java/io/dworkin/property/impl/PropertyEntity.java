@@ -1,14 +1,14 @@
-package io.dworkin.model;
+package io.dworkin.property.impl;
 
 /**
- * Created by yakov_000 on 10.03.2015.
+ * Created by yakov_000 on 16.03.2015.
  */
-public class CategoryEntity {
+public class PropertyEntity {
 
     private String name;
     private String displayName;
 
-    public CategoryEntity(String name, String displayName) {
+    public PropertyEntity(String name, String displayName) {
         this.name = name;
         this.displayName = displayName;
     }

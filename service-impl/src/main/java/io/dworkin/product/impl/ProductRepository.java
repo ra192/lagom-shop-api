@@ -1,26 +1,26 @@
-package io.dworkin.dao.impl;
+package io.dworkin.product.impl;
 
-import io.dworkin.dao.ProductDao;
 import io.dworkin.db.MyConnectionPool;
-import io.dworkin.model.ProductEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * Created by yakov on 19.03.2017.
  */
-public class ProductDaoImpl implements ProductDao {
+public class ProductRepository {
 
     private final MyConnectionPool connectionPool;
 
-    public ProductDaoImpl(MyConnectionPool connectionPool) {
+    public ProductRepository(MyConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
-
-    @Override
-    public CompletableFuture<Optional<ProductEntity>> getByCode(String code) {
+    public CompletionStage<Optional<ProductEntity>> getByCode(String code) {
         CompletableFuture<Optional<ProductEntity>> future = new CompletableFuture<>();
 
         String query = "select * from product where code = $1";
@@ -38,8 +38,7 @@ public class ProductDaoImpl implements ProductDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<List<ProductEntity>> listByCategoryNameAndPropertyValues(String category, List<List<String>> propertyValues,
+    public CompletionStage<List<ProductEntity>> listByCategoryNameAndPropertyValues(String category, List<List<String>> propertyValues,
                                                                                       Integer first, Integer max, String orderProperty, Boolean isAsc) {
 
         final CompletableFuture<List<ProductEntity>> future = new CompletableFuture<>();

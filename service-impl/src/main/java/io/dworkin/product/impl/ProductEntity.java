@@ -1,4 +1,4 @@
-package io.dworkin.model;
+package io.dworkin.product.impl;
 
 /**
  * Created by yakov_000 on 10.03.2015.

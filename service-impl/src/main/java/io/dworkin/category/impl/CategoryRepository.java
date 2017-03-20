@@ -1,33 +1,27 @@
-package io.dworkin.dao.impl;
+package io.dworkin.category.impl;
 
 
-import io.dworkin.dao.CategoryDao;
 import io.dworkin.db.MyConnectionPool;
-import io.dworkin.model.CategoryEntity;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * {@link CategoryDao} implementation using pgasynk
+ * Category repository using pgasynk
  * Created by yakov on 14.03.2017.
  */
-public class CategoryDaoImpl implements CategoryDao {
+public class CategoryRepository {
 
     private final MyConnectionPool connectionPool;
 
-    public CategoryDaoImpl(MyConnectionPool connectionPool) {
+    public CategoryRepository(MyConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
-    @Override
-    public CompletableFuture<Optional<CategoryEntity>> getByName(String name) {
+    public CompletionStage<Optional<CategoryEntity>> getByName(String name) {
 
         final CompletableFuture<Optional<CategoryEntity>> future = new CompletableFuture<>();
 
@@ -45,8 +39,7 @@ public class CategoryDaoImpl implements CategoryDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<List<CategoryEntity>> listRoots() {
+    public CompletionStage<List<CategoryEntity>> listRoots() {
         final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
 
         final String query = "select * from category where parent_id is null";
@@ -64,8 +57,7 @@ public class CategoryDaoImpl implements CategoryDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<List<CategoryEntity>> listByParentName(String name) {
+    public CompletionStage<List<CategoryEntity>> listByParentName(String name) {
 
         final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
 
@@ -84,8 +76,7 @@ public class CategoryDaoImpl implements CategoryDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<Long> create(CategoryEntity category, String parentName, Set<String> propertyNames) {
+    public CompletionStage<Long> create(CategoryEntity category, String parentName, Set<String> propertyNames) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
@@ -99,8 +90,7 @@ public class CategoryDaoImpl implements CategoryDao {
         return future;
     }
 
-    @Override
-    public CompletableFuture<Boolean> update(CategoryEntity category, String parentName, Set<String> propertyNames) {
+    public CompletionStage<Boolean> update(CategoryEntity category, String parentName, Set<String> propertyNames) {
 
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
 

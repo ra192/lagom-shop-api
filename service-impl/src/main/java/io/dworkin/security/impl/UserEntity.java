@@ -1,4 +1,4 @@
-package io.dworkin.model;
+package io.dworkin.security.impl;
 
 /**
  * Created by yakov on 19.03.2017.

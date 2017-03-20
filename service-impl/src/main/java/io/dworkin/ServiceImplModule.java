@@ -10,17 +10,13 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dworkin.category.api.CategoryService;
 import io.dworkin.category.impl.CategoryServiceImpl;
-import io.dworkin.dao.CategoryDao;
-import io.dworkin.dao.ProductDao;
-import io.dworkin.dao.PropertyDao;
-import io.dworkin.dao.UserDao;
-import io.dworkin.dao.impl.CategoryDaoImpl;
-import io.dworkin.dao.impl.ProductDaoImpl;
-import io.dworkin.dao.impl.PropertyDaoImpl;
-import io.dworkin.dao.impl.UserDaoImpl;
+import io.dworkin.category.impl.CategoryRepository;
+import io.dworkin.security.impl.UserRepository;
 import io.dworkin.db.MyConnectionPool;
 import io.dworkin.product.api.ProductService;
+import io.dworkin.product.impl.ProductRepository;
 import io.dworkin.product.impl.ProductServiceImpl;
+import io.dworkin.property.impl.PropertyRepository;
 
 /**
  * The module that binds the HelloService so that it can be served.
@@ -46,22 +42,22 @@ public class ServiceImplModule extends AbstractModule implements ServiceGuiceSup
     }
 
     @Provides
-    PropertyDao providePropertyDao(MyConnectionPool connectionPool) {
-        return new PropertyDaoImpl(connectionPool);
+    PropertyRepository providePropertyRepository(MyConnectionPool connectionPool) {
+        return new PropertyRepository(connectionPool);
     }
 
     @Provides
-    CategoryDao provideCategoryDao(MyConnectionPool connectionPool) {
-        return new CategoryDaoImpl(connectionPool);
+    CategoryRepository provideCategoryRepository(MyConnectionPool connectionPool) {
+        return new CategoryRepository(connectionPool);
     }
 
     @Provides
-    ProductDao provideProductDao(MyConnectionPool connectionPool) {
-        return new ProductDaoImpl(connectionPool);
+    ProductRepository provideProductRepository(MyConnectionPool connectionPool) {
+        return new ProductRepository(connectionPool);
     }
 
     @Provides
-    UserDao provideUserDao(MyConnectionPool connectionPool) {
-        return new UserDaoImpl(connectionPool);
+    UserRepository provideUserRepository(MyConnectionPool connectionPool) {
+        return new UserRepository(connectionPool);
     }
 }
