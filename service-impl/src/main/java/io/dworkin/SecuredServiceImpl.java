@@ -25,11 +25,12 @@ public abstract class SecuredServiceImpl {
 
     protected <Request, Response> ServerServiceCall<Request, Response> authenticated(Function<String, ServerServiceCall<Request, Response>> authCall) {
         return HeaderServiceCall.composeAsync(requestHeader -> {
-            final CompletionStage<Optional<String>> usernameFuture = CompletableFuture.completedFuture(
-                    requestHeader.getHeader("token").map(usrName -> {
-                        if (usrName.equalsIgnoreCase("secured")) return "ra";
-                        else return "wrong";
-                    }));
+            final CompletionStage<Optional<String>> usernameFuture = requestHeader.getHeader("token").map(token -> {
+                final Optional<String> res;
+                if (token.equalsIgnoreCase("secured")) res = Optional.of("ra");
+                else res = Optional.empty();
+                return CompletableFuture.completedFuture(res);
+            }).orElse(CompletableFuture.completedFuture(Optional.empty()));
 
             return usernameFuture.thenApply(usernameOpt -> {
                 if (usernameOpt.isPresent())
