@@ -9,14 +9,26 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>product-api</artifactId>
+    <artifactId>security-impl</artifactId>
 
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.lightbend.lagom</groupId>
-            <artifactId>lagom-javadsl-api_2.11</artifactId>
+            <artifactId>lagom-javadsl-server_2.11</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.alaisi.pgasync</groupId>
+            <artifactId>postgres-async-driver</artifactId>
+            <version>0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-handler</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
+
 </project>
