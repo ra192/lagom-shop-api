@@ -40,10 +40,10 @@ public abstract class SecuredServiceImpl {
         });
     }
 
-    protected <Request, Response> ServerServiceCall<Request, Response> authorized(List<String> allowedRoles, Supplier<ServerServiceCall<Request, Response>> authCall) {
+    protected <Request, Response> ServerServiceCall<Request, Response> authorized(List<String> allowedRoles, ServerServiceCall<Request, Response> authCall) {
         return authenticated(username -> HeaderServiceCall.composeAsync(requestHeader -> userDao.getRoles(username).thenApply(roles -> {
             if (roles.containsAll(allowedRoles))
-                return authCall.get();
+                return authCall;
             else throw new Forbidden("Permissions denied");
         })));
     }

@@ -53,14 +53,14 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
 
     @Override
     public ServiceCall<CategoryRequest, String> create() {
-        return authorized(singletonList("category-management"), () -> createRequest ->
+        return authorized(singletonList("category-management"), createRequest ->
                 categoryDao.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
                         createRequest.properties).thenApply(res -> "ok"));
     }
 
     @Override
     public ServiceCall<CategoryRequest, String> update() {
-        return authorized(singletonList("category-management"), () -> createRequest ->
+        return authorized(singletonList("category-management"), createRequest ->
                 categoryDao.update(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
                         createRequest.properties).thenApply(res -> "ok"));
     }
