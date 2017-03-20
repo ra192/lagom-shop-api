@@ -1,4 +1,4 @@
-package io.dworkin.category.api;
+package io.dworkin.product.api;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.*;

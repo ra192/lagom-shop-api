@@ -1,7 +1,7 @@
 package io.dworkin.category.impl;
 
 
-import io.dworkin.db.MyConnectionPool;
+import com.github.pgasync.ConnectionPool;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -15,9 +15,9 @@ import java.util.stream.StreamSupport;
  */
 public class CategoryRepository {
 
-    private final MyConnectionPool connectionPool;
+    private final ConnectionPool connectionPool;
 
-    public CategoryRepository(MyConnectionPool connectionPool) {
+    public CategoryRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
@@ -25,7 +25,7 @@ public class CategoryRepository {
 
         final CompletableFuture<Optional<CategoryEntity>> future = new CompletableFuture<>();
 
-        connectionPool.getDb().query("select * from category where name=$1", Arrays.asList(name), result -> {
+        connectionPool.query("select * from category where name=$1", Arrays.asList(name), result -> {
             if (result.size() > 0) {
                 final CategoryEntity category = new CategoryEntity(result.row(0).getString("name"),
                         result.row(0).getString("displayName"));
@@ -44,7 +44,7 @@ public class CategoryRepository {
 
         final String query = "select * from category where parent_id is null";
 
-        connectionPool.getDb().query(query,
+        connectionPool.query(query,
                 result -> {
                     final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
                             .map(row -> new CategoryEntity(row.getString("name"), row.getString("displayname")))
@@ -63,7 +63,7 @@ public class CategoryRepository {
 
         final String query = "select * from category where parent_id = (select id from category where name=$1)";
 
-        connectionPool.getDb().query(query, Arrays.asList(name),
+        connectionPool.query(query, Arrays.asList(name),
                 result -> {
                     final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
                             .map(row -> new CategoryEntity(row.getString("name"), row.getString("displayname")))
@@ -83,8 +83,8 @@ public class CategoryRepository {
 
         String query = "INSERT INTO category(id, displayname, name, parent_id) VALUES (nextval('category_id_seq'), $1, $2, (select id from category where name = $3));";
 
-        connectionPool.getDb().query(query, Arrays.asList(category.getDisplayName(), category.getName(), parentName),
-                result -> connectionPool.getDb().query(updatePropertiesQuery(category.getName(), propertyNames),
+        connectionPool.query(query, Arrays.asList(category.getDisplayName(), category.getName(), parentName),
+                result -> connectionPool.query(updatePropertiesQuery(category.getName(), propertyNames),
                         res -> future.complete(1L), future::completeExceptionally), future::completeExceptionally);
 
         return future;
@@ -96,8 +96,8 @@ public class CategoryRepository {
 
         String query = "UPDATE category SET displayname=$2, parent_id=(select id from category where name=$3) WHERE name=$1;";
 
-        connectionPool.getDb().query(query, Arrays.asList(category.getName(), category.getDisplayName(), parentName),
-                result -> connectionPool.getDb().query(updatePropertiesQuery(category.getName(), propertyNames),
+        connectionPool.query(query, Arrays.asList(category.getName(), category.getDisplayName(), parentName),
+                result -> connectionPool.query(updatePropertiesQuery(category.getName(), propertyNames),
                         res -> future.complete(true), future::completeExceptionally), future::completeExceptionally);
 
         return future;

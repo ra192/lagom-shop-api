@@ -1,6 +1,6 @@
 package io.dworkin.product.impl;
 
-import io.dworkin.db.MyConnectionPool;
+import com.github.pgasync.ConnectionPool;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +14,9 @@ import java.util.concurrent.CompletionStage;
  */
 public class ProductRepository {
 
-    private final MyConnectionPool connectionPool;
+    private final ConnectionPool connectionPool;
 
-    public ProductRepository(MyConnectionPool connectionPool) {
+    public ProductRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
@@ -25,7 +25,7 @@ public class ProductRepository {
 
         String query = "select * from product where code = $1";
 
-        connectionPool.getDb().query(query, Arrays.asList(code), result -> {
+        connectionPool.query(query, Arrays.asList(code), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(
                         new ProductEntity(result.row(0).getString("code"), result.row(0).getString("displayName"),
@@ -51,7 +51,7 @@ public class ProductRepository {
             queryBuilder.append(" desc");
         queryBuilder.append(" limit ").append(max).append(" offset ").append(first);
 
-        connectionPool.getDb().query(queryBuilder.toString(),
+        connectionPool.query(queryBuilder.toString(),
                 queryRes -> {
                     List<ProductEntity> products = new ArrayList<>();
                     queryRes.forEach(row -> products.add(new ProductEntity(row.getString("code"), row.getString("displayName"),

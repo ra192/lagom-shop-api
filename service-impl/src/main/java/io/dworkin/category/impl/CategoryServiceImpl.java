@@ -3,9 +3,9 @@ package io.dworkin.category.impl;
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import io.dworkin.security.impl.SecuredServiceImpl;
-import io.dworkin.category.api.Category;
-import io.dworkin.category.api.CategoryRequest;
-import io.dworkin.category.api.CategoryService;
+import io.dworkin.product.api.Category;
+import io.dworkin.product.api.CategoryRequest;
+import io.dworkin.product.api.CategoryService;
 import io.dworkin.security.impl.UserRepository;
 
 import javax.inject.Inject;

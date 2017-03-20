@@ -1,6 +1,6 @@
 package io.dworkin.property.impl;
 
-import io.dworkin.db.MyConnectionPool;
+import com.github.pgasync.ConnectionPool;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -13,9 +13,9 @@ import java.util.concurrent.CompletionStage;
  */
 public class PropertyRepository {
 
-    private final MyConnectionPool connectionPool;
+    private final ConnectionPool connectionPool;
 
-    public PropertyRepository(MyConnectionPool connectionPool) {
+    public PropertyRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
@@ -25,7 +25,7 @@ public class PropertyRepository {
 
         String query = "select * from property where name=$1";
 
-        connectionPool.getDb().query(query, Arrays.asList(name), result -> {
+        connectionPool.query(query, Arrays.asList(name), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(
                         new PropertyEntity(result.row(0).getString("name"), result.row(0).getString("displayName"))));
@@ -41,7 +41,7 @@ public class PropertyRepository {
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
         String query = "INSERT INTO property(id, displayname, name) VALUES (nextval('property_id_seq'), $1, $2)";
-        connectionPool.getDb().query(query, Arrays.asList(property.getDisplayName(), property.getName()),
+        connectionPool.query(query, Arrays.asList(property.getDisplayName(), property.getName()),
                 res -> future.complete(1L), future::completeExceptionally);
 
         return future;
@@ -52,7 +52,7 @@ public class PropertyRepository {
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
         String query = "UPDATE property SET displayname=$1 WHERE name=$2";
-        connectionPool.getDb().query(query, Arrays.asList(property.getDisplayName(), property.getName()),
+        connectionPool.query(query, Arrays.asList(property.getDisplayName(), property.getName()),
                 res -> future.complete(1L), future::completeExceptionally);
 
         return future;

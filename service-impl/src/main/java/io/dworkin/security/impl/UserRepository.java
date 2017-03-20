@@ -1,6 +1,6 @@
 package io.dworkin.security.impl;
 
-import io.dworkin.db.MyConnectionPool;
+import com.github.pgasync.ConnectionPool;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +15,9 @@ import static java.util.stream.Collectors.toList;
  * Created by yakov on 19.03.2017.
  */
 public class UserRepository {
-    private final MyConnectionPool connectionPool;
+    private final ConnectionPool connectionPool;
 
-    public UserRepository(MyConnectionPool connectionPool) {
+    public UserRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
@@ -26,7 +26,7 @@ public class UserRepository {
 
         final String query = "select * from \"user\" where username=$1";
 
-        connectionPool.getDb().query(query, Arrays.asList(username), result -> {
+        connectionPool.query(query, Arrays.asList(username), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(new UserEntity(result.row(0).getString("username"), result.row(0).getString("password"))));
             else future.complete(Optional.empty());
@@ -39,7 +39,7 @@ public class UserRepository {
         CompletableFuture<List<String>> future = new CompletableFuture<>();
 
         final String query = "select role from user_role where user_id=(select id from \"user\" where username=$1)";
-        connectionPool.getDb().query(query, Arrays.asList(username), result ->
+        connectionPool.query(query, Arrays.asList(username), result ->
                 future.complete(StreamSupport.stream(result.spliterator(), false)
                         .map(row -> row.getString("role")).collect(toList())), future::completeExceptionally);
 

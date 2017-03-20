@@ -22,8 +22,8 @@ public interface ProductService extends Service {
 
     @Override
     default Descriptor descriptor() {
-        return named("product").withCalls(
-                pathCall("/api/product/list", this::listFiltered)
+        return Service.named("product").withCalls(
+                Service.pathCall("/api/product/list", this::listFiltered)
         ).withAutoAcl(true);
     }
 }
