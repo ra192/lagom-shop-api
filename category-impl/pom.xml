@@ -9,14 +9,14 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>service-impl</artifactId>
+    <artifactId>category-impl</artifactId>
 
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>service-api</artifactId>
+            <artifactId>category-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
