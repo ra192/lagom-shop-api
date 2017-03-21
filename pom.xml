@@ -16,6 +16,8 @@
         <module>product-impl</module>
         <module>integration-tests</module>
         <module>security-impl</module>
+        <module>authorization-api</module>
+        <module>authorization-impl</module>
     </modules>
 
     <build>

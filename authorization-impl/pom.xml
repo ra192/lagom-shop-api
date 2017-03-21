@@ -9,14 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>product-impl</artifactId>
+    <artifactId>authorization-impl</artifactId>
 
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>product-api</artifactId>
+            <artifactId>authorization-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
