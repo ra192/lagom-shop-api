@@ -4,6 +4,7 @@ import com.lightbend.lagom.javadsl.api.transport.Forbidden;
 import com.lightbend.lagom.javadsl.server.HeaderServiceCall;
 import com.lightbend.lagom.javadsl.server.ServerServiceCall;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
@@ -24,21 +25,21 @@ public abstract class SecuredServiceImpl {
 
     protected <Request, Response> ServerServiceCall<Request, Response> authenticated(Function<String, ServerServiceCall<Request, Response>> authCall) {
         return HeaderServiceCall.composeAsync(requestHeader -> {
-            final CompletionStage<Optional<String>> usernameFuture = requestHeader.getHeader("token").map(token ->
-                    tokenRepository.getUsernameByToken(token)).orElseThrow(()->new Forbidden("Token header is not specified"));
+            final CompletionStage<Optional<TokenEntity>> tokenFuture = requestHeader.getHeader("token")
+                    .map(tokenRepository::getUsernameByToken).orElseThrow(() -> new Forbidden("Token header is not specified"));
 
-            return usernameFuture.thenApply(usernameOpt -> {
-                if (usernameOpt.isPresent())
-                    return authCall.apply(usernameOpt.get());
+            return tokenFuture.thenApply(tokenOpt -> {
+                if (tokenOpt.isPresent() && tokenOpt.get().getValidTo().after(new Date()))
+                    return authCall.apply(tokenOpt.get().getUsername());
                 else throw new Forbidden("Wrong token");
             });
         });
     }
 
     protected <Request, Response> ServerServiceCall<Request, Response> authorized(List<String> allowedRoles, ServerServiceCall<Request, Response> authCall) {
-        return authenticated(username-> request->userRepository.getRoles(username).thenCompose(roles -> {
-            if(roles.containsAll(allowedRoles))
-            return authCall.invoke(request);
+        return authenticated(username -> request -> userRepository.getRoles(username).thenCompose(roles -> {
+            if (roles.containsAll(allowedRoles))
+                return authCall.invoke(request);
             else throw new Forbidden("Permissions denied");
         }));
     }
