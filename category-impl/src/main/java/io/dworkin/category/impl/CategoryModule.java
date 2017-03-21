@@ -11,6 +11,7 @@ import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dworkin.product.api.CategoryService;
+import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
 
 /**
@@ -46,9 +47,13 @@ public class CategoryModule extends AbstractModule implements ServiceGuiceSuppor
         return new CategoryRepository(connectionPool);
     }
 
-
     @Provides
     UserRepository provideUserRepository(ConnectionPool connectionPool) {
         return new UserRepository(connectionPool);
+    }
+
+    @Provides
+    TokenRepository tokenRepository(ConnectionPool connectionPool) {
+        return new TokenRepository(connectionPool);
     }
 }

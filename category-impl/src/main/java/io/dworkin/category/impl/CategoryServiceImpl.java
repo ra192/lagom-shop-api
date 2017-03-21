@@ -6,6 +6,7 @@ import io.dworkin.product.api.Category;
 import io.dworkin.product.api.CategoryRequest;
 import io.dworkin.product.api.CategoryService;
 import io.dworkin.security.impl.SecuredServiceImpl;
+import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
 
 import javax.inject.Inject;
@@ -22,11 +23,13 @@ import static java.util.stream.Collectors.toList;
 public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TokenRepository tokenRepository;
 
     @Inject
-    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
-        super(userRepository);
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository, TokenRepository tokenRepository) {
+        super(userRepository, tokenRepository);
         this.categoryRepository = categoryRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override

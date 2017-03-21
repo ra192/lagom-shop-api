@@ -6,7 +6,6 @@ import com.lightbend.lagom.javadsl.server.ServerServiceCall;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
@@ -16,19 +15,17 @@ import java.util.function.Function;
 public abstract class SecuredServiceImpl {
 
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
-    protected SecuredServiceImpl(UserRepository userRepository) {
+    protected SecuredServiceImpl(UserRepository userRepository, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     protected <Request, Response> ServerServiceCall<Request, Response> authenticated(Function<String, ServerServiceCall<Request, Response>> authCall) {
         return HeaderServiceCall.composeAsync(requestHeader -> {
-            final CompletionStage<Optional<String>> usernameFuture = requestHeader.getHeader("token").map(token -> {
-                final Optional<String> res;
-                if (token.equalsIgnoreCase("secured")) res = Optional.of("ra");
-                else res = Optional.empty();
-                return CompletableFuture.completedFuture(res);
-            }).orElse(CompletableFuture.completedFuture(Optional.empty()));
+            final CompletionStage<Optional<String>> usernameFuture = requestHeader.getHeader("token").map(token ->
+                    tokenRepository.getUsernameByToken(token)).orElseThrow(()->new Forbidden("Token header is not specified"));
 
             return usernameFuture.thenApply(usernameOpt -> {
                 if (usernameOpt.isPresent())

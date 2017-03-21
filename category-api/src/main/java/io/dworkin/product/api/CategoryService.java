@@ -22,7 +22,7 @@ public interface CategoryService extends Service {
 
     /**
      * Create category
-     * Example: curl -X POST -H "Content-Type:application/json" -H "token:secured" -d '{"token":"secured","name":"test1", "displayName":"test1", "parent":"pc_parts", "properties":["manufacturer","socket"]}' http://localhost:9000/api/category/create
+     * Example: curl -X POST -H "Content-Type:application/json" -H "token:lsL3mfpulYOHdYVXz3lhQwso2aDzCAjV" -d '{"name":"test1", "displayName":"test1", "parent":"pc_parts", "properties":["manufacturer","socket"]}' http://localhost:9000/api/category/create
      *
      * @return ok if success
      */
