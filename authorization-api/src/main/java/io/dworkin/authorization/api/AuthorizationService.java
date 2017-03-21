@@ -14,6 +14,7 @@ public interface AuthorizationService extends Service {
 
     /**
      * curl -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" http://localhost:9000/api/authorization/token
+     * for Aladdin:OpenSesame
      * @return
      */
     ServiceCall<NotUsed,String>authorize();

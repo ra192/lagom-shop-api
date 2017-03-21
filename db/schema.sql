@@ -185,6 +185,19 @@ CREATE TABLE user_role (
 
 ALTER TABLE user_role OWNER TO myshop;
 
+CREATE TABLE public.token
+(
+  user_id bigint,
+  token character varying,
+  valid_to timestamp with time zone
+)
+WITH (
+  OIDS=FALSE
+);
+
+ALTER TABLE public.token
+  OWNER TO myshop;
+
 --
 -- TOC entry 2038 (class 2606 OID 74751)
 -- Name: category category_pkey; Type: CONSTRAINT; Schema: public; Owner: myshop
@@ -363,7 +376,6 @@ ALTER TABLE ONLY category_property
 
 ALTER TABLE ONLY user_role
     ADD CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id) REFERENCES "user"(id);
-
 
 -- Completed on 2017-03-19 20:53:25
 

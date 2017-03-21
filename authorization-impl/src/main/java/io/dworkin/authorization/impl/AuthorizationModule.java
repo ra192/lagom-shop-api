@@ -8,6 +8,7 @@ import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dworkin.authorization.api.AuthorizationService;
+import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
 
 /**
@@ -40,5 +41,10 @@ public class AuthorizationModule extends AbstractModule implements ServiceGuiceS
     @Provides
     UserRepository userRepository(ConnectionPool connectionPool) {
         return new UserRepository(connectionPool);
+    }
+
+    @Provides
+    TokenRepository tokenRepository(ConnectionPool connectionPool) {
+        return new TokenRepository(connectionPool);
     }
 }
