@@ -1,5 +1,6 @@
 package io.dworkin.product.impl;
 
+import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
 import io.dworkin.product.api.ListFilteredRequest;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static java.util.stream.Collectors.toList;
 
@@ -44,6 +46,16 @@ public class ProductServiceImpl implements ProductService {
                     .thenApply(products -> products.stream().map(itm ->
                             new Product(itm.getCode(), itm.getDisplayName(), itm.getPrice(), itm.getDescription(), itm.getImageUrl()))
                             .collect(toList()));
+        };
+    }
+
+    public ServiceCall<NotUsed,NotUsed> countPropertyValues() {
+        return request->{
+          log.info("Product count property values method was invoked");
+
+
+
+          return CompletableFuture.completedFuture(NotUsed.getInstance());
         };
     }
 }

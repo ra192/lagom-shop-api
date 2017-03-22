@@ -5,24 +5,12 @@ package io.dworkin.property.impl;
  */
 public class PropertyValueEntity {
 
-    private Long id;
     private String name;
     private String displayName;
-    private Long propertyId;
 
     public PropertyValueEntity(Long id, String name, String displayName, Long propertyId) {
-        this.id = id;
         this.name = name;
         this.displayName = displayName;
-        this.propertyId=propertyId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -39,13 +27,5 @@ public class PropertyValueEntity {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    public Long getPropertyId() {
-        return propertyId;
-    }
-
-    public void setPropertyId(Long propertyId) {
-        this.propertyId = propertyId;
     }
 }
