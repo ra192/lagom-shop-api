@@ -5,6 +5,8 @@ import com.typesafe.config.Config;
 import io.dworkin.product.api.ListFilteredRequest;
 import io.dworkin.product.api.Product;
 import io.dworkin.product.api.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -20,6 +22,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final Config config;
 
+    private final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
+
     @Inject
     public ProductServiceImpl(ProductRepository productRepository, Config config) {
         this.productRepository = productRepository;
@@ -29,6 +33,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ServiceCall<ListFilteredRequest, List<Product>> listFiltered() {
         return request -> {
+            log.info("Product list filtered method was invoked with: {}", request);
 
             final Integer first = (request.first != null) ? request.first : 0;
             final Integer max = (request.max != null) ? request.max : first + config.getInt("product.list.max.default");

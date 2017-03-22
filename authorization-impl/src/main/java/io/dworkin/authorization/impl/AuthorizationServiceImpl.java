@@ -13,6 +13,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Date;
@@ -25,6 +27,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
 
+    private final Logger log= LoggerFactory.getLogger(AuthorizationServiceImpl.class);
+
     @Inject
     public AuthorizationServiceImpl(UserRepository userRepository, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
@@ -35,10 +39,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     public HeaderServiceCall<NotUsed, String> authorize() {
 
         return (requestHeader, request) -> {
-            ResponseHeader responseHeader = ResponseHeader.OK
-                    .withHeader("Server", "Hello service");
+            log.info("Authorization method was invoked");
 
             return requestHeader.getHeader("Authorization").map(auth -> {
+                log.info("Authorization token: {}",auth);
                 String[] usernameAndPass = new String(Base64.decodeBase64(auth.replaceFirst("Basic", "").trim())).split(":");
                 if (usernameAndPass.length < 2 || StringUtils.isBlank(usernameAndPass[0]) || StringUtils.isBlank(usernameAndPass[1]))
                     throw new Forbidden("Authorization header is not valid");
@@ -47,7 +51,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     if (hashedPass.equalsIgnoreCase(user.getPassword())) {
                         final String token = RandomStringUtils.randomAlphanumeric(32);
                         return tokenRepository.createToken(new TokenEntity(user.getUsername(), token, new Date()))
-                                .thenApply(res -> Pair.create(responseHeader, token));
+                                .thenApply(res -> Pair.create(ResponseHeader.OK, token));
                     } else
                         throw new Forbidden("wrong password");
                 }).orElseThrow(() -> new Forbidden("user not found")));
