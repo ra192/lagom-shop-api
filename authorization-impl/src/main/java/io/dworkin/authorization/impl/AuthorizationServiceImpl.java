@@ -6,6 +6,7 @@ import com.lightbend.lagom.javadsl.api.transport.Forbidden;
 import com.lightbend.lagom.javadsl.api.transport.ResponseHeader;
 import com.lightbend.lagom.javadsl.server.HeaderServiceCall;
 import io.dworkin.authorization.api.AuthorizationService;
+import io.dworkin.security.impl.TokenEntity;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
 import org.apache.commons.codec.binary.Base64;
@@ -44,8 +45,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 return userRepository.getByName(usernameAndPass[0]).thenComposeAsync(userOpt -> userOpt.map(user -> {
                     String hashedPass = DigestUtils.sha256Hex(usernameAndPass[1]);
                     if (hashedPass.equalsIgnoreCase(user.getPassword())) {
-                        final String token= RandomStringUtils.randomAlphanumeric(32);
-                        return tokenRepository.createToken(user.getUsername(), token, new Date()).thenApply(res->Pair.create(responseHeader, token));
+                        final String token = RandomStringUtils.randomAlphanumeric(32);
+                        return tokenRepository.createToken(new TokenEntity(user.getUsername(), token, new Date()))
+                                .thenApply(res -> Pair.create(responseHeader, token));
                     } else
                         throw new Forbidden("wrong password");
                 }).orElseThrow(() -> new Forbidden("user not found")));
