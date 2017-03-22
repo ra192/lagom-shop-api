@@ -75,7 +75,7 @@ public class ProductRepository {
                 .append(" where prod.category_id=(select id from category where name='").append(category).append("')");
 
         if (property != null) {
-            queryBuilder.append(" and prop.name = ").append(property);
+            queryBuilder.append(" and prop.name = '").append(property).append("'");
 
             final List<List<String>> propertyValuesFiltered = propertyValues.stream()
                     .filter(pair -> !pair.first().equals(property)).map(Pair::second).collect(toList());
@@ -88,7 +88,7 @@ public class ProductRepository {
         if (!flatPropertyValues.isEmpty()) {
             queryBuilder.append(" and propval.name not in (");
             for (int i = 0; i < flatPropertyValues.size(); i++) {
-                queryBuilder.append(flatPropertyValues.get(i));
+                queryBuilder.append("'").append(flatPropertyValues.get(i)).append("'");
                 if (i != flatPropertyValues.size() - 1)
                     queryBuilder.append(",");
             }

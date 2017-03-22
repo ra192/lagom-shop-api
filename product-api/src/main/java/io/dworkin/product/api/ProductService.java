@@ -20,10 +20,18 @@ public interface ProductService extends Service {
      */
     ServiceCall<ListFilteredRequest, List<Product>> listFiltered();
 
+    /**
+     * Get products list by category and product properties
+     * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[{"property":"manufacturer","propertyValues":["intel"]}]}' http://localhost:9000/api/product/countPropertyValues
+     * @return products list
+     */
+    ServiceCall<CountPropertyValueRequest, CountPropertyValueResponse> countPropertyValues();
+
     @Override
     default Descriptor descriptor() {
-        return Service.named("product").withCalls(
-                Service.pathCall("/api/product/list", this::listFiltered)
+        return named("product").withCalls(
+                pathCall("/api/product/list", this::listFiltered),
+                pathCall("/api/product/countPropertyValues", this::countPropertyValues)
         ).withAutoAcl(true);
     }
 }

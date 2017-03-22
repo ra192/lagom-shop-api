@@ -1,17 +1,18 @@
 package io.dworkin.product.impl;
 
-import akka.NotUsed;
+import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
-import io.dworkin.product.api.ListFilteredRequest;
-import io.dworkin.product.api.Product;
-import io.dworkin.product.api.ProductService;
+import io.dworkin.product.api.*;
+import io.dworkin.product.api.CountPropertyValueResponse.CountPropertyItem;
+import io.dworkin.product.api.CountPropertyValueResponse.CountPropertyValueItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.concurrent.Futures;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import static java.util.stream.Collectors.toList;
 
@@ -49,13 +50,31 @@ public class ProductServiceImpl implements ProductService {
         };
     }
 
-    public ServiceCall<NotUsed,NotUsed> countPropertyValues() {
-        return request->{
-          log.info("Product count property values method was invoked");
+    @Override
+    public ServiceCall<CountPropertyValueRequest, CountPropertyValueResponse> countPropertyValues() {
+        return request -> {
+            log.info("Product count property values method was invoked with: {}", request);
 
+            final List<Pair<String, List<String>>> propertyValues = request.properties.stream()
+                    .map(itm -> new Pair<>(itm.property, itm.propertyValues)).collect(toList());
 
+            final CompletionStage<List<ProductRepository.PropertyWithCount>> propertyValuesStage =
+                    productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, null, propertyValues);
 
-          return CompletableFuture.completedFuture(NotUsed.getInstance());
+            final CompletionStage<List<List<ProductRepository.PropertyWithCount>>> additionalPropertyValuesStages =
+                    Futures.sequence(propertyValues.stream().map(pair -> productRepository
+                            .countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
+
+            return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new).thenApply(pair ->
+                    new CountPropertyValueResponse(pair.first().stream().map(propItm ->
+                            new CountPropertyItem(propItm.name, propItm.diaplayName, propItm.propertyValues.stream().map(propValItm ->
+                                    new CountPropertyValueItem(propValItm.name, propValItm.diaplayName, propValItm.count))
+                                    .collect(toList()))).collect(toList()),
+                            pair.second().stream().map(addPropItms -> addPropItms.stream().map(addPropItm ->
+                                    new CountPropertyItem(addPropItm.name, addPropItm.diaplayName,
+                                            addPropItm.propertyValues.stream().map(addPropValItm ->
+                                                    new CountPropertyValueItem(addPropValItm.name, addPropValItm.diaplayName, addPropValItm.count))
+                                                    .collect(toList()))).collect(toList())).collect(toList())));
         };
     }
 }
