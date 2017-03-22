@@ -2790,7 +2790,7 @@ SELECT pg_catalog.setval('property_id_seq', 1, false);
 -- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: myshop
 --
 
-INSERT INTO "user" VALUES (1, 'ra', 'pass');
+INSERT INTO "user" VALUES (1, 'Aladdin', '5ff0e82e56c3cf647e81f5134d3e4f839875efb69bf4d271298e11e032da5db5');
 
 
 --
