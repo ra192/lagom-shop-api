@@ -8,6 +8,8 @@ import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.dworkin.product.api.ProductService;
+import io.dworkin.security.impl.TokenRepository;
+import io.dworkin.security.impl.UserRepository;
 
 /**
  * Created by yakov on 20.03.2017.
@@ -40,5 +42,15 @@ public class ProductModule extends AbstractModule implements ServiceGuiceSupport
     @Provides
     ProductRepository productRepository(ConnectionPool connectionPool) {
         return new ProductRepository(connectionPool);
+    }
+
+    @Provides
+    UserRepository userRepository(ConnectionPool connectionPool) {
+        return new UserRepository(connectionPool);
+    }
+
+    @Provides
+    TokenRepository tokenRepository(ConnectionPool connectionPool) {
+        return new TokenRepository(connectionPool);
     }
 }

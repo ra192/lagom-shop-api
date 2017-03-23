@@ -3,7 +3,7 @@ package io.dworkin.category.impl;
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import io.dworkin.product.api.Category;
-import io.dworkin.product.api.CategoryRequest;
+import io.dworkin.product.api.ManageCategoryRequest;
 import io.dworkin.product.api.CategoryService;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
@@ -65,7 +65,7 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
     }
 
     @Override
-    public ServiceCall<CategoryRequest, String> create() {
+    public ServiceCall<ManageCategoryRequest, String> create() {
         return authorized(singletonList("category-management"), createRequest -> {
             log.info("Create category method was invoked with params: {}", createRequest);
 
@@ -75,7 +75,7 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
     }
 
     @Override
-    public ServiceCall<CategoryRequest, String> update() {
+    public ServiceCall<ManageCategoryRequest, String> update() {
         return authorized(singletonList("category-management"), updateRequest -> {
             log.info("Update category method was invoked with params: {}", updateRequest);
 

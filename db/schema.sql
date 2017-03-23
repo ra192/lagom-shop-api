@@ -101,6 +101,16 @@ CREATE TABLE product (
 
 ALTER TABLE product OWNER TO myshop;
 
+CREATE SEQUENCE product_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE product_id_seq OWNER TO myshop;
+
 --
 -- TOC entry 188 (class 1259 OID 74726)
 -- Name: product_property_value; Type: TABLE; Schema: public; Owner: myshop

@@ -26,9 +26,9 @@ public interface CategoryService extends Service {
      *
      * @return ok if success
      */
-    ServiceCall<CategoryRequest, String> create();
+    ServiceCall<ManageCategoryRequest, String> create();
 
-    ServiceCall<CategoryRequest, String> update();
+    ServiceCall<ManageCategoryRequest, String> update();
 
     @Override
     default Descriptor descriptor() {

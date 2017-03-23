@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -26,7 +27,7 @@ public class ProductRepository {
 
         String query = "select * from product where code = $1";
 
-        connectionPool.query(query, Arrays.asList(code), result -> {
+        connectionPool.query(query, asList(code), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(
                         new ProductEntity(result.row(0).getString("code"), result.row(0).getString("displayName"),
@@ -84,7 +85,7 @@ public class ProductRepository {
         } else
             buildPropertyValuesSubqueries(propertyValues.stream().map(Pair::second).collect(toList()), queryBuilder);
 
-        final List<String> flatPropertyValues = propertyValues.stream().flatMap(pair->pair.second().stream()).collect(toList());
+        final List<String> flatPropertyValues = propertyValues.stream().flatMap(pair -> pair.second().stream()).collect(toList());
         if (!flatPropertyValues.isEmpty()) {
             queryBuilder.append(" and propval.name not in (");
             for (int i = 0; i < flatPropertyValues.size(); i++) {
@@ -117,6 +118,32 @@ public class ProductRepository {
         return future;
     }
 
+    public CompletionStage<Boolean> create(ProductEntity productEntity, String category, List<String> propertyValues) {
+        final CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        final String query = "insert into product(id, code, displayname, description, imageurl, price, category_id) values (nextval('product_id_seq',$1,$2,$3,$4,$5,(select id from category where name=$6))";
+
+        connectionPool.query(query, asList(productEntity.getCode(), productEntity.getDisplayName(),
+                productEntity.getDescription(), productEntity.getImageUrl(), productEntity.getPrice(), category),
+                result -> connectionPool.query(updatePropertyValuesQuery(productEntity.getCode(), propertyValues),
+                        res2 -> future.complete(true), future::completeExceptionally), future::completeExceptionally);
+
+        return future;
+    }
+
+    public CompletionStage<Boolean> update(ProductEntity productEntity, String category, List<String> propertyValues) {
+        final CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        final String query = "update product set displayname=$2, description=$3, imageurl=$4, price=$5, category_id=(select id from category where name=$6) where code=$1";
+
+        connectionPool.query(query, asList(productEntity.getCode(), productEntity.getDisplayName(),
+                productEntity.getDescription(), productEntity.getImageUrl(), productEntity.getPrice(), category),
+                result -> connectionPool.query(updatePropertyValuesQuery(productEntity.getCode(), propertyValues),
+                        res2 -> future.complete(true), future::completeExceptionally), future::completeExceptionally);
+
+        return future;
+    }
+
     private void buildPropertyValuesSubqueries(List<List<String>> propertyValues, StringBuilder queryBuilder) {
         propertyValues.forEach(names -> {
             queryBuilder.append(" and exists (select * from product_property_value where prod.id=product_id and propertyvalues_id in (");
@@ -129,11 +156,33 @@ public class ProductRepository {
         });
     }
 
+    private String updatePropertyValuesQuery(String code, List<String> propertyValues) {
+        final StringBuffer stringBuffer = new StringBuffer("delete from product_property_value where product_id = (select id from product where code = '");
+        stringBuffer
+                .append(code).append("');");
+
+        if (!propertyValues.isEmpty()) {
+            stringBuffer.append("INSERT INTO product_property_value(product_id, propertyvalues_id) VALUES");
+            final Iterator<String> iterator = propertyValues.iterator();
+            while (iterator.hasNext()) {
+                final String propertyValueName = iterator.next();
+                stringBuffer.append(" ((select id from product where code='").append(code)
+                        .append("'), (select id from property_value where name='").append(propertyValueName).append("'))");
+                if (iterator.hasNext())
+                    stringBuffer.append(", ");
+                else
+                    stringBuffer.append(";");
+            }
+        }
+
+        return stringBuffer.toString();
+    }
+
     public static class PropertyWithCount {
         public final String name;
         public final String diaplayName;
 
-        public final List<PropertyValueWithCount>propertyValues;
+        public final List<PropertyValueWithCount> propertyValues;
 
         public PropertyWithCount(String name, String diaplayName) {
             this.name = name;

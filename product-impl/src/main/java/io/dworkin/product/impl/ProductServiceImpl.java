@@ -6,11 +6,15 @@ import com.typesafe.config.Config;
 import io.dworkin.product.api.*;
 import io.dworkin.product.api.CountPropertyValueResponse.CountPropertyItem;
 import io.dworkin.product.api.CountPropertyValueResponse.CountPropertyValueItem;
+import io.dworkin.security.impl.SecuredServiceImpl;
+import io.dworkin.security.impl.TokenRepository;
+import io.dworkin.security.impl.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.concurrent.Futures;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
@@ -20,7 +24,7 @@ import static java.util.stream.Collectors.toList;
  * {@link ProductService} implementation
  * Created by yakov on 19.03.2017.
  */
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl extends SecuredServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final Config config;
@@ -28,7 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Inject
-    public ProductServiceImpl(ProductRepository productRepository, Config config) {
+    public ProductServiceImpl(ProductRepository productRepository, UserRepository userRepository, TokenRepository tokenRepository, Config config) {
+        super(userRepository, tokenRepository);
         this.productRepository = productRepository;
         this.config = config;
     }
@@ -76,5 +81,27 @@ public class ProductServiceImpl implements ProductService {
                                                     new CountPropertyValueItem(addPropValItm.name, addPropValItm.diaplayName, addPropValItm.count))
                                                     .collect(toList()))).collect(toList())).collect(toList())));
         };
+    }
+
+    @Override
+    public ServiceCall<ManageProductRequest, String> create() {
+        return authorized(Arrays.asList("manage-product"), createRequest -> {
+            log.info("Create product method was invoked with: {}", createRequest);
+
+            return productRepository.create(new ProductEntity(createRequest.code, createRequest.displayName,
+                    createRequest.price, createRequest.description, createRequest.imageUrl), createRequest.category,
+                    createRequest.propertyValues).thenApply(result -> "ok");
+        });
+    }
+
+    @Override
+    public ServiceCall<ManageProductRequest, String> update() {
+        return authorized(Arrays.asList("manage-product"), updateRequest -> {
+            log.info("Update product method was invoked with: {}", updateRequest);
+
+            return productRepository.update(new ProductEntity(updateRequest.code, updateRequest.displayName,
+                            updateRequest.price, updateRequest.description, updateRequest.imageUrl), updateRequest.category,
+                    updateRequest.propertyValues).thenApply(result -> "ok");
+        });
     }
 }

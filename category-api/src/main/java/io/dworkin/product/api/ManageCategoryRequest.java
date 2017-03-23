@@ -15,7 +15,7 @@ import java.util.Set;
  */
 @Immutable
 @JsonDeserialize
-public final class CategoryRequest {
+public final class ManageCategoryRequest {
     public final String name;
     public final String displayName;
 
@@ -26,7 +26,7 @@ public final class CategoryRequest {
     public final String token;
 
     @JsonCreator
-    public CategoryRequest(String name, String displayName, String parent, Set<String> properties, String token) {
+    public ManageCategoryRequest(String name, String displayName, String parent, Set<String> properties, String token) {
         this.name = Preconditions.checkNotNull(name);
         this.displayName = Preconditions.checkNotNull(displayName);
         this.parent = parent;
@@ -38,7 +38,7 @@ public final class CategoryRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CategoryRequest that = (CategoryRequest) o;
+        ManageCategoryRequest that = (ManageCategoryRequest) o;
         return Objects.equal(name, that.name);
     }
 

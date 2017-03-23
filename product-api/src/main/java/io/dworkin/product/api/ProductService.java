@@ -27,11 +27,17 @@ public interface ProductService extends Service {
      */
     ServiceCall<CountPropertyValueRequest, CountPropertyValueResponse> countPropertyValues();
 
+    ServiceCall<ManageProductRequest, String> create();
+
+    ServiceCall<ManageProductRequest, String> update();
+
     @Override
     default Descriptor descriptor() {
         return named("product").withCalls(
                 pathCall("/api/product/list", this::listFiltered),
-                pathCall("/api/product/countPropertyValues", this::countPropertyValues)
+                pathCall("/api/product/countPropertyValues", this::countPropertyValues),
+                pathCall("/api/product/create", this::create),
+                pathCall("/api/product/update", this::update)
         ).withAutoAcl(true);
     }
 }
