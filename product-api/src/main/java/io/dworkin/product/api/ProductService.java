@@ -15,7 +15,7 @@ public interface ProductService extends Service {
 
     /**
      * Get products list by category and product properties
-     * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[["intel"],["socket-1150","socket-2011"]]}' http://localhost:9000/api/product/list
+     * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[{"propertyValues":["intel"]},{"propertyValues":["socket-1150","socket-2011"]}]}' http://localhost:9000/api/product/list
      * @return products list
      */
     ServiceCall<ListFilteredRequest, List<Product>> listFiltered();
