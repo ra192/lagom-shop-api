@@ -15,14 +15,14 @@ import java.util.List;
 @JsonDeserialize
 public final class ListFilteredRequest {
     public final String category;
-    public final List<List<String>> properties;
+    public final List<PropertyItem> properties;
     public final Integer first;
     public final Integer max;
     public final String orderBy;
     public final Boolean isAsc;
 
     @JsonCreator
-    public ListFilteredRequest(String category, List<List<String>> properties, Integer first, Integer max, String orderBy, Boolean isAsc) {
+    public ListFilteredRequest(String category, List<PropertyItem> properties, Integer first, Integer max, String orderBy, Boolean isAsc) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
         this.first = first;

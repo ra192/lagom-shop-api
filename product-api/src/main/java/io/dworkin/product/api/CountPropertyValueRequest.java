@@ -15,10 +15,10 @@ import java.util.List;
 @JsonDeserialize
 public final class CountPropertyValueRequest {
     public final String category;
-    public final List<PropertyValuesItem> properties;
+    public final List<PropertyItem> properties;
 
     @JsonCreator
-    public CountPropertyValueRequest(String category, List<PropertyValuesItem> properties) {
+    public CountPropertyValueRequest(String category, List<PropertyItem> properties) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
     }
@@ -29,26 +29,5 @@ public final class CountPropertyValueRequest {
                 .add("category", category)
                 .add("properties", properties)
                 .toString();
-    }
-
-    @Immutable
-    @JsonDeserialize
-    public static class PropertyValuesItem {
-        public final String property;
-        public final List<String>propertyValues;
-
-        @JsonCreator
-        public PropertyValuesItem(String property, List<String> propertyValues) {
-            this.property = property;
-            this.propertyValues = propertyValues;
-        }
-
-        @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                    .add("property", property)
-                    .add("properties", propertyValues)
-                    .toString();
-        }
     }
 }

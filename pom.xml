@@ -12,9 +12,10 @@
     <modules>
         <module>category-api</module>
         <module>category-impl</module>
+        <module>category-tests</module>
         <module>product-api</module>
         <module>product-impl</module>
-        <module>integration-tests</module>
+        <module>product-tests</module>
         <module>security-impl</module>
         <module>authorization-api</module>
         <module>authorization-impl</module>
