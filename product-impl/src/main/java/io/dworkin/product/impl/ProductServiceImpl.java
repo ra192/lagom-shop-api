@@ -4,8 +4,8 @@ import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
 import io.dworkin.product.api.*;
-import io.dworkin.product.api.CountPropertyValueResponse.CountPropertyItem;
-import io.dworkin.product.api.CountPropertyValueResponse.CountPropertyValueItem;
+import io.dworkin.product.api.CountPropertyValuesResponse.CountPropertyItem;
+import io.dworkin.product.api.CountPropertyValuesResponse.CountPropertyValueItem;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
@@ -57,7 +57,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
     }
 
     @Override
-    public ServiceCall<CountPropertyValueRequest, CountPropertyValueResponse> countPropertyValues() {
+    public ServiceCall<CountPropertyValuesRequest, CountPropertyValuesResponse> countPropertyValues() {
         return request -> {
             log.info("Product count property values method was invoked with: {}", request);
 
@@ -72,7 +72,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
                             .countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
 
             return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new).thenApply(pair ->
-                    new CountPropertyValueResponse(pair.first().stream().map(propItm ->
+                    new CountPropertyValuesResponse(pair.first().stream().map(propItm ->
                             new CountPropertyItem(propItm.name, propItm.diaplayName, propItm.propertyValues.stream().map(propValItm ->
                                     new CountPropertyValueItem(propValItm.name, propValItm.diaplayName, propValItm.count))
                                     .collect(toList()))).collect(toList()),

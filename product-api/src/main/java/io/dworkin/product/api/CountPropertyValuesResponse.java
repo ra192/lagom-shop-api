@@ -11,11 +11,11 @@ import java.util.List;
  */
 @Immutable
 @JsonSerialize
-public final  class CountPropertyValueResponse {
+public final  class CountPropertyValuesResponse {
     public final List<CountPropertyItem> properties;
     public final List<List<CountPropertyItem>> additionalProperties;
 
-    public CountPropertyValueResponse(List<CountPropertyItem> properties, List<List<CountPropertyItem>> additionalProperties) {
+    public CountPropertyValuesResponse(List<CountPropertyItem> properties, List<List<CountPropertyItem>> additionalProperties) {
         this.properties = properties;
         this.additionalProperties = additionalProperties;
     }

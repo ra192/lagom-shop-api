@@ -25,7 +25,7 @@ public interface ProductService extends Service {
      * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[{"property":"manufacturer","propertyValues":["intel"]}]}' http://localhost:9000/api/product/countPropertyValues
      * @return products list
      */
-    ServiceCall<CountPropertyValueRequest, CountPropertyValueResponse> countPropertyValues();
+    ServiceCall<CountPropertyValuesRequest, CountPropertyValuesResponse> countPropertyValues();
 
     ServiceCall<ManageProductRequest, String> create();
 
