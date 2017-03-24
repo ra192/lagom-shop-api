@@ -4,6 +4,7 @@ import com.lightbend.lagom.javadsl.api.transport.Forbidden;
 import com.lightbend.lagom.javadsl.server.HeaderServiceCall;
 import com.lightbend.lagom.javadsl.server.ServerServiceCall;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public abstract class SecuredServiceImpl {
                     .map(tokenRepository::getUsernameByToken).orElseThrow(() -> new Forbidden("Token header is not specified"));
 
             return tokenFuture.thenApply(tokenOpt -> {
-                if (tokenOpt.isPresent() && tokenOpt.get().getValidTo().after(new Date()))
+                if (tokenOpt.isPresent() && tokenOpt.get().getValidTo().isAfter(Instant.now()))
                     return authCall.apply(tokenOpt.get().getUsername());
                 else throw new Forbidden("Wrong token");
             });

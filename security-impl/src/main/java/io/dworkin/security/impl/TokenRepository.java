@@ -27,7 +27,7 @@ public class TokenRepository {
         connectionPool.query(query, asList(token), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(new TokenEntity(result.row(0).getString("username"),
-                        result.row(0).getString("token"), result.row(0).getTimestamp("valid_to"))));
+                        result.row(0).getString("token"), result.row(0).getTimestamp("valid_to").toInstant())));
             else
                 future.complete(Optional.empty());
         }, future::completeExceptionally);
@@ -41,7 +41,7 @@ public class TokenRepository {
         final String query = "insert into token(user_id,token,valid_to) values ((select id from \"user\" where username=$1),$2,$3)";
 
         connectionPool.query(query, asList(tokenEntity.getUsername(), tokenEntity.getToken(),
-                new Timestamp(tokenEntity.getValidTo().getTime())), result -> future.complete(true), future::completeExceptionally);
+                new Timestamp(tokenEntity.getValidTo().toEpochMilli())), result -> future.complete(true), future::completeExceptionally);
 
         return future;
     }

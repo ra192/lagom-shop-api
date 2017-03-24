@@ -1,6 +1,6 @@
 package io.dworkin.security.impl;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Created by yakov on 22.03.2017.
@@ -8,9 +8,9 @@ import java.util.Date;
 public class TokenEntity {
     private String username;
     private String token;
-    private Date validTo;
+    private Instant validTo;
 
-    public TokenEntity(String username, String token, Date validTo) {
+    public TokenEntity(String username, String token, Instant validTo) {
         this.username = username;
         this.token = token;
         this.validTo = validTo;
@@ -32,11 +32,11 @@ public class TokenEntity {
         this.token = token;
     }
 
-    public Date getValidTo() {
+    public Instant getValidTo() {
         return validTo;
     }
 
-    public void setValidTo(Date validTo) {
+    public void setValidTo(Instant validTo) {
         this.validTo = validTo;
     }
 }

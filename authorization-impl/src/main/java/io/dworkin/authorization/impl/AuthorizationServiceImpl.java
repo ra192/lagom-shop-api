@@ -17,7 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Created by yakov on 21.03.2017.
@@ -27,7 +28,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
 
-    private final Logger log= LoggerFactory.getLogger(AuthorizationServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(AuthorizationServiceImpl.class);
 
     @Inject
     public AuthorizationServiceImpl(UserRepository userRepository, TokenRepository tokenRepository) {
@@ -42,7 +43,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             log.info("Authorization method was invoked");
 
             return requestHeader.getHeader("Authorization").map(auth -> {
-                log.info("Authorization token: {}",auth);
+                log.info("Authorization token: {}", auth);
                 String[] usernameAndPass = new String(Base64.decodeBase64(auth.replaceFirst("Basic", "").trim())).split(":");
                 if (usernameAndPass.length < 2 || StringUtils.isBlank(usernameAndPass[0]) || StringUtils.isBlank(usernameAndPass[1]))
                     throw new Forbidden("Authorization header is not valid");
@@ -50,7 +51,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     String hashedPass = DigestUtils.sha256Hex(usernameAndPass[1]);
                     if (hashedPass.equalsIgnoreCase(user.getPassword())) {
                         final String token = RandomStringUtils.randomAlphanumeric(32);
-                        return tokenRepository.createToken(new TokenEntity(user.getUsername(), token, new Date()))
+                        return tokenRepository.createToken(new TokenEntity(user.getUsername(), token,
+                                Instant.now().plus(1, ChronoUnit.DAYS)))
                                 .thenApply(res -> Pair.create(ResponseHeader.OK, token));
                     } else
                         throw new Forbidden("wrong password");
