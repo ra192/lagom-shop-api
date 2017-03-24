@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>category-api</artifactId>
+            <artifactId>category-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -34,6 +34,10 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lightbend.lagom</groupId>
+            <artifactId>lagom-javadsl-testkit_2.11</artifactId>
         </dependency>
     </dependencies>
 
