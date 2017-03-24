@@ -1,6 +1,7 @@
 package io.dworkin.product.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.MoreObjects;
 
@@ -18,7 +19,7 @@ public class PropertyItem {
     public final List<String> propertyValues;
 
     @JsonCreator
-    public PropertyItem(String property, List<String> propertyValues) {
+    public PropertyItem(@JsonProperty("property") String property, @JsonProperty("propertyValues") List<String> propertyValues) {
         this.property = property;
         this.propertyValues = propertyValues;
     }

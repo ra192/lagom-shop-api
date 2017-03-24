@@ -1,7 +1,9 @@
 package io.dworkin.product.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
@@ -22,7 +24,9 @@ public final class ListFilteredRequest {
     public final Boolean isAsc;
 
     @JsonCreator
-    public ListFilteredRequest(String category, List<PropertyItem> properties, Integer first, Integer max, String orderBy, Boolean isAsc) {
+    public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") List<PropertyItem> properties,
+                               @JsonProperty("first") Integer first, @JsonProperty("max") Integer max,
+                               @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsk") Boolean isAsc) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
         this.first = first;

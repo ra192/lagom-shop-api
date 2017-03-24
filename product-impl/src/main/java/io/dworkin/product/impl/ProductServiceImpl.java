@@ -48,7 +48,8 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             final String orderBy = (request.orderBy != null) ? request.orderBy : "displayName";
             final Boolean isAsk = (request.isAsc != null) ? request.isAsc : true;
 
-            return productRepository.listByCategoryNameAndPropertyValues(request.category, request.properties, first, max, orderBy, isAsk)
+            return productRepository.listByCategoryNameAndPropertyValues(request.category,
+                    request.properties.stream().map(propItm -> propItm.propertyValues).collect(toList()), first, max, orderBy, isAsk)
                     .thenApply(products -> products.stream().map(itm ->
                             new Product(itm.getCode(), itm.getDisplayName(), itm.getPrice(), itm.getDescription(), itm.getImageUrl()))
                             .collect(toList()));
@@ -89,7 +90,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             log.info("Create product method was invoked with: {}", createRequest);
 
             return productRepository.create(new ProductEntity(createRequest.code, createRequest.displayName,
-                    createRequest.price, createRequest.description, createRequest.imageUrl), createRequest.category,
+                            createRequest.price, createRequest.description, createRequest.imageUrl), createRequest.category,
                     createRequest.propertyValues).thenApply(result -> "ok");
         });
     }
