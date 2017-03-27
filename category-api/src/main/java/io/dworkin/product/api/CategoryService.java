@@ -2,10 +2,10 @@ package io.dworkin.product.api;
 
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.*;
+import org.pcollections.PSequence;
 
 import static com.lightbend.lagom.javadsl.api.Service.*;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,9 +16,9 @@ public interface CategoryService extends Service {
 
     ServiceCall<NotUsed, Optional<Category>> getByName(String name);
 
-    ServiceCall<NotUsed, List<Category>> listRoots();
+    ServiceCall<NotUsed, PSequence<Category>> listRoots();
 
-    ServiceCall<NotUsed, List<Category>> listByParent(String name);
+    ServiceCall<NotUsed, PSequence<Category>> listByParent(String name);
 
     /**
      * Create category

@@ -4,11 +4,11 @@ import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
 import io.dworkin.product.api.*;
-import io.dworkin.product.api.CountPropertyValuesResponse.CountPropertyItem;
-import io.dworkin.product.api.CountPropertyValuesResponse.CountPropertyValueItem;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
+import org.pcollections.PSequence;
+import org.pcollections.TreePVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.concurrent.Futures;
@@ -39,7 +39,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
     }
 
     @Override
-    public ServiceCall<ListFilteredRequest, List<Product>> listFiltered() {
+    public ServiceCall<ListFilteredRequest, PSequence<Product>> listFiltered() {
         return request -> {
             log.info("Product list filtered method was invoked with: {}", request);
 
@@ -48,39 +48,27 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             final String orderBy = (request.orderBy != null) ? request.orderBy : "displayName";
             final Boolean isAsk = (request.isAsc != null) ? request.isAsc : true;
 
-            return productRepository.listByCategoryNameAndPropertyValues(request.category,
-                    request.properties.stream().map(propItm -> propItm.propertyValues).collect(toList()), first, max, orderBy, isAsk)
-                    .thenApply(products -> products.stream().map(itm ->
-                            new Product(itm.getCode(), itm.getDisplayName(), itm.getPrice(), itm.getDescription(), itm.getImageUrl()))
-                            .collect(toList()));
+            return productRepository.listByCategoryNameAndPropertyValues(request.category, TreePVector.from(
+                    request.properties.stream().map(propItm -> propItm.propertyValues).collect(toList())), first, max, orderBy, isAsk);
         };
     }
 
     @Override
     public ServiceCall<CountPropertyValuesRequest, CountPropertyValuesResponse> countPropertyValues() {
         return request -> {
-            log.info("Product count property values method was invoked with: {}", request);
+            log.info("Product count name values method was invoked with: {}", request);
 
-            final List<Pair<String, List<String>>> propertyValues = request.properties.stream()
-                    .map(itm -> new Pair<>(itm.property, itm.propertyValues)).collect(toList());
+            final PSequence<Pair<String, PSequence<String>>> propertyValues = TreePVector.from(request.properties.stream()
+                    .map(itm -> new Pair<>(itm.name, itm.propertyValues)).collect(toList()));
 
-            final CompletionStage<List<ProductRepository.PropertyWithCount>> propertyValuesStage =
+            final CompletionStage<PSequence<PropertyWithCount>> propertyValuesStage =
                     productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, null, propertyValues);
 
-            final CompletionStage<List<List<ProductRepository.PropertyWithCount>>> additionalPropertyValuesStages =
-                    Futures.sequence(propertyValues.stream().map(pair -> productRepository
-                            .countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
+            final CompletionStage<List<PSequence<PropertyWithCount>>> additionalPropertyValuesStages =
+                    Futures.sequence(propertyValues.stream().map(pair -> productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
 
             return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new).thenApply(pair ->
-                    new CountPropertyValuesResponse(pair.first().stream().map(propItm ->
-                            new CountPropertyItem(propItm.name, propItm.diaplayName, propItm.propertyValues.stream().map(propValItm ->
-                                    new CountPropertyValueItem(propValItm.name, propValItm.diaplayName, propValItm.count))
-                                    .collect(toList()))).collect(toList()),
-                            pair.second().stream().map(addPropItms -> addPropItms.stream().map(addPropItm ->
-                                    new CountPropertyItem(addPropItm.name, addPropItm.diaplayName,
-                                            addPropItm.propertyValues.stream().map(addPropValItm ->
-                                                    new CountPropertyValueItem(addPropValItm.name, addPropValItm.diaplayName, addPropValItm.count))
-                                                    .collect(toList()))).collect(toList())).collect(toList())));
+                    new CountPropertyValuesResponse(pair.first(), TreePVector.from(pair.second())));
         };
     }
 
@@ -89,7 +77,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
         return authorized(Arrays.asList("manage-product"), createRequest -> {
             log.info("Create product method was invoked with: {}", createRequest);
 
-            return productRepository.create(new ProductEntity(createRequest.code, createRequest.displayName,
+            return productRepository.create(new Product(createRequest.code, createRequest.displayName,
                             createRequest.price, createRequest.description, createRequest.imageUrl), createRequest.category,
                     createRequest.propertyValues).thenApply(result -> "ok");
         });
@@ -100,7 +88,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
         return authorized(Arrays.asList("manage-product"), updateRequest -> {
             log.info("Update product method was invoked with: {}", updateRequest);
 
-            return productRepository.update(new ProductEntity(updateRequest.code, updateRequest.displayName,
+            return productRepository.update(new Product(updateRequest.code, updateRequest.displayName,
                             updateRequest.price, updateRequest.description, updateRequest.imageUrl), updateRequest.category,
                     updateRequest.propertyValues).thenApply(result -> "ok");
         });

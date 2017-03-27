@@ -2,8 +2,7 @@ package io.dworkin.product.api;
 
 import com.lightbend.lagom.javadsl.api.Descriptor;
 import com.lightbend.lagom.javadsl.api.*;
-
-import java.util.List;
+import org.pcollections.PSequence;
 
 import static com.lightbend.lagom.javadsl.api.Service.*;
 
@@ -18,11 +17,11 @@ public interface ProductService extends Service {
      * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[{"propertyValues":["intel"]},{"propertyValues":["socket-1150","socket-2011"]}]}' http://localhost:9000/api/product/list
      * @return products list
      */
-    ServiceCall<ListFilteredRequest, List<Product>> listFiltered();
+    ServiceCall<ListFilteredRequest, PSequence<Product>> listFiltered();
 
     /**
      * Get products list by category and product properties
-     * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[{"property":"manufacturer","propertyValues":["intel"]}]}' http://localhost:9000/api/product/countPropertyValues
+     * Example: curl -X POST -H "Content-Type:application/json" -d '{"category":"cpu", "properties":[{"name":"manufacturer","propertyValues":["intel"]}]}' http://localhost:9000/api/product/countPropertyValues
      * @return products list
      */
     ServiceCall<CountPropertyValuesRequest, CountPropertyValuesResponse> countPropertyValues();

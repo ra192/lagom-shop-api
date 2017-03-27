@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import org.pcollections.PSequence;
 
 import javax.annotation.concurrent.Immutable;
-import java.util.List;
 
 /**
  * Created by yakov on 22.03.2017.
@@ -16,10 +16,10 @@ import java.util.List;
 @JsonDeserialize
 public final class CountPropertyValuesRequest {
     public final String category;
-    public final List<PropertyItem> properties;
+    public final PSequence<Property> properties;
 
     @JsonCreator
-    public CountPropertyValuesRequest(@JsonProperty("category") String category, @JsonProperty("properties") List<PropertyItem> properties) {
+    public CountPropertyValuesRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<Property> properties) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
     }

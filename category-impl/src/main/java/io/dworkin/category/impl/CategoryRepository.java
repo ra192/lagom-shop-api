@@ -2,8 +2,14 @@ package io.dworkin.category.impl;
 
 
 import com.github.pgasync.ConnectionPool;
+import io.dworkin.product.api.Category;
+import org.pcollections.PSequence;
+import org.pcollections.TreePVector;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
@@ -21,16 +27,14 @@ public class CategoryRepository {
         this.connectionPool = connectionPool;
     }
 
-    public CompletionStage<Optional<CategoryEntity>> getByName(String name) {
+    public CompletionStage<Optional<Category>> getByName(String name) {
 
-        final CompletableFuture<Optional<CategoryEntity>> future = new CompletableFuture<>();
+        final CompletableFuture<Optional<Category>> future = new CompletableFuture<>();
 
         connectionPool.query("select * from category where name=$1", Arrays.asList(name), result -> {
             if (result.size() > 0) {
-                final CategoryEntity category = new CategoryEntity(result.row(0).getString("name"),
-                        result.row(0).getString("displayName"));
-
-                future.complete(Optional.of(category));
+                future.complete(Optional.of(new Category(result.row(0).getString("name"),
+                        result.row(0).getString("displayName"))));
             } else {
                 future.complete(Optional.empty());
             }
@@ -39,65 +43,57 @@ public class CategoryRepository {
         return future;
     }
 
-    public CompletionStage<List<CategoryEntity>> listRoots() {
-        final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
+    public CompletionStage<PSequence<Category>> listRoots() {
+        final CompletableFuture<PSequence<Category>> future = new CompletableFuture<>();
 
         final String query = "select * from category where parent_id is null";
 
         connectionPool.query(query,
-                result -> {
-                    final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
-                            .map(row -> new CategoryEntity(row.getString("name"), row.getString("displayname")))
-                            .collect(Collectors.toList());
-
-                    future.complete(categories);
-                },
+                result -> future.complete(TreePVector.from(StreamSupport.stream(result.spliterator(), false)
+                        .map(row -> new Category(row.getString("name"), row.getString("displayname")))
+                        .collect(Collectors.toList()))),
                 future::completeExceptionally);
 
         return future;
     }
 
-    public CompletionStage<List<CategoryEntity>> listByParentName(String name) {
+    public CompletionStage<PSequence<Category>> listByParentName(String name) {
 
-        final CompletableFuture<List<CategoryEntity>> future = new CompletableFuture<>();
+        final CompletableFuture<PSequence<Category>> future = new CompletableFuture<>();
 
         final String query = "select * from category where parent_id = (select id from category where name=$1)";
 
         connectionPool.query(query, Arrays.asList(name),
-                result -> {
-                    final List<CategoryEntity> categories = StreamSupport.stream(result.spliterator(), false)
-                            .map(row -> new CategoryEntity(row.getString("name"), row.getString("displayname")))
-                            .collect(Collectors.toList());
-
-                    future.complete(categories);
-                },
+                result -> future.complete(TreePVector.from(StreamSupport.stream(result.spliterator(), false)
+                        .map(row -> new Category(row.getString("name"), row.getString("displayname")))
+                        .collect(Collectors.toList()))),
                 future::completeExceptionally);
 
         return future;
     }
 
-    public CompletionStage<Long> create(CategoryEntity category, String parentName, Set<String> propertyNames) {
+    public CompletionStage<Long> create(Category category, String parentName, Set<String> propertyNames) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
 
         String query = "INSERT INTO category(id, displayname, name, parent_id) VALUES (nextval('category_id_seq'), $1, $2, (select id from category where name = $3));";
 
-        connectionPool.query(query, Arrays.asList(category.getDisplayName(), category.getName(), parentName),
-                result -> connectionPool.query(updatePropertiesQuery(category.getName(), propertyNames),
+        connectionPool.query(query, Arrays.asList(category.displayName, category.name, parentName),
+                result -> connectionPool.query(updatePropertiesQuery(category.name, propertyNames),
                         res -> future.complete(1L), future::completeExceptionally), future::completeExceptionally);
 
         return future;
     }
 
-    public CompletionStage<Boolean> update(CategoryEntity category, String parentName, Set<String> propertyNames) {
+    public CompletionStage<Boolean> update(Category category, String parentName, Set<String> propertyNames) {
 
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         String query = "UPDATE category SET displayname=$2, parent_id=(select id from category where name=$3) WHERE name=$1;";
 
-        connectionPool.query(query, Arrays.asList(category.getName(), category.getDisplayName(), parentName),
-                result -> connectionPool.query(updatePropertiesQuery(category.getName(), propertyNames),
+        connectionPool.query(query, Arrays.asList(category.name, category.displayName, parentName),
+                result -> connectionPool.query(updatePropertiesQuery(category.name, propertyNames),
                         res -> future.complete(true), future::completeExceptionally), future::completeExceptionally);
 
         return future;

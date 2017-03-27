@@ -8,15 +8,14 @@ import io.dworkin.product.api.CategoryService;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
+import org.pcollections.PSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 
 /**
  * {@link CategoryService} implementation
@@ -38,29 +37,28 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
 
     @Override
     public ServiceCall<NotUsed, Optional<Category>> getByName(String name) {
-        return notUsed -> categoryRepository.getByName(name).thenApply(catOpt -> catOpt.map(cat ->
-                new Category(cat.getName(), cat.getDisplayName())));
-    }
-
-    @Override
-    public ServiceCall<NotUsed, List<Category>> listRoots() {
         return notUsed -> {
-            log.info("Category list roots method was invoked");
+            log.info("Category get by name method was invoked with: {}",name);
 
-            return categoryRepository.listRoots()
-                    .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
-                            .collect(toList()));
+            return categoryRepository.getByName(name);
         };
     }
 
     @Override
-    public ServiceCall<NotUsed, List<Category>> listByParent(String name) {
+    public ServiceCall<NotUsed, PSequence<Category>> listRoots() {
+        return notUsed -> {
+            log.info("Category list roots method was invoked");
+
+            return categoryRepository.listRoots();
+        };
+    }
+
+    @Override
+    public ServiceCall<NotUsed, PSequence<Category>> listByParent(String name) {
         return notUsed -> {
             log.info("Category list by parent method was invoked with parent name {}", name);
 
-            return categoryRepository.listByParentName(name)
-                    .thenApply(cats -> cats.stream().map(itm -> new Category(itm.getName(), itm.getDisplayName()))
-                            .collect(toList()));
+            return categoryRepository.listByParentName(name);
         };
     }
 
@@ -69,7 +67,7 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
         return authorized(singletonList("category-management"), createRequest -> {
             log.info("Create category method was invoked with params: {}", createRequest);
 
-            return categoryRepository.create(new CategoryEntity(createRequest.name, createRequest.displayName), createRequest.parent,
+            return categoryRepository.create(new Category(createRequest.name, createRequest.displayName), createRequest.parent,
                     createRequest.properties).thenApply(res -> "ok");
         });
     }
@@ -79,7 +77,7 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
         return authorized(singletonList("category-management"), updateRequest -> {
             log.info("Update category method was invoked with params: {}", updateRequest);
 
-            return categoryRepository.update(new CategoryEntity(updateRequest.name, updateRequest.displayName), updateRequest.parent,
+            return categoryRepository.update(new Category(updateRequest.name, updateRequest.displayName), updateRequest.parent,
                     updateRequest.properties).thenApply(res -> "ok");
         });
     }

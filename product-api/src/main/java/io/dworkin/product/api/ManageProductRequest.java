@@ -3,9 +3,9 @@ package io.dworkin.product.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.MoreObjects;
+import org.pcollections.PSequence;
 
 import javax.annotation.concurrent.Immutable;
-import java.util.List;
 
 /**
  * Created by yakov on 23.03.2017.
@@ -19,10 +19,10 @@ public class ManageProductRequest {
     public final String description;
     public final String imageUrl;
     public final String category;
-    public final List<String>propertyValues;
+    public final PSequence<String> propertyValues;
 
     @JsonCreator
-    public ManageProductRequest(String code, String displayName, Double price, String description, String imageUrl, String category, List<String> propertyValues) {
+    public ManageProductRequest(String code, String displayName, Double price, String description, String imageUrl, String category, PSequence<String> propertyValues) {
         this.code = code;
         this.displayName = displayName;
         this.price = price;

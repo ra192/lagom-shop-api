@@ -3,12 +3,11 @@ package io.dworkin.product.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import org.pcollections.PSequence;
 
 import javax.annotation.concurrent.Immutable;
-import java.util.List;
 
 /**
  * Created by yakov on 19.03.2017.
@@ -17,14 +16,14 @@ import java.util.List;
 @JsonDeserialize
 public final class ListFilteredRequest {
     public final String category;
-    public final List<PropertyItem> properties;
+    public final PSequence<Property> properties;
     public final Integer first;
     public final Integer max;
     public final String orderBy;
     public final Boolean isAsc;
 
     @JsonCreator
-    public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") List<PropertyItem> properties,
+    public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<Property> properties,
                                @JsonProperty("first") Integer first, @JsonProperty("max") Integer max,
                                @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsk") Boolean isAsc) {
         this.category = Preconditions.checkNotNull(category);
