@@ -44,11 +44,11 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
 
     @Override
     public ServiceCall<NotUsed, PSequence<Category>> listRoots() {
-        return notUsed -> {
+        return withCors(notUsed -> {
             log.info("Category list roots method was invoked");
 
             return categoryRepository.listRoots();
-        };
+        });
     }
 
     @Override
@@ -62,12 +62,12 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
 
     @Override
     public ServiceCall<ManageCategoryRequest, String> create() {
-        return authorized(singletonList("category-management"), createRequest -> {
+        return authorized(singletonList("category-management"), withCors(createRequest -> {
             log.info("Create category method was invoked with params: {}", createRequest);
 
             return categoryRepository.create(new Category(createRequest.name, createRequest.displayName), createRequest.parent,
                     createRequest.properties).thenApply(res -> "ok");
-        });
+        }));
     }
 
     @Override
