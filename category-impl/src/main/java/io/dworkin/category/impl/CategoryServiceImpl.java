@@ -24,7 +24,6 @@ import static java.util.Collections.singletonList;
 public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final TokenRepository tokenRepository;
 
     private final Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
@@ -32,7 +31,6 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
     public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository, TokenRepository tokenRepository) {
         super(userRepository, tokenRepository);
         this.categoryRepository = categoryRepository;
-        this.tokenRepository = tokenRepository;
     }
 
     @Override
