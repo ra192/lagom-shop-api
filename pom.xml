@@ -19,6 +19,7 @@
         <module>security-impl</module>
         <module>authorization-api</module>
         <module>authorization-impl</module>
+        <module>security-api</module>
     </modules>
 
     <build>

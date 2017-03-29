@@ -1,12 +1,16 @@
 package io.dworkin.product.api;
 
 import akka.NotUsed;
-import com.lightbend.lagom.javadsl.api.*;
+import com.lightbend.lagom.javadsl.api.Descriptor;
+import com.lightbend.lagom.javadsl.api.Service;
+import com.lightbend.lagom.javadsl.api.ServiceCall;
+import io.dworkin.security.filters.CorsFilter;
 import org.pcollections.PSequence;
 
-import static com.lightbend.lagom.javadsl.api.Service.*;
-
 import java.util.Optional;
+
+import static com.lightbend.lagom.javadsl.api.Service.named;
+import static com.lightbend.lagom.javadsl.api.Service.pathCall;
 
 /**
  * Category service interface
@@ -38,6 +42,6 @@ public interface CategoryService extends Service {
                 pathCall("/api/category/list/:parentName", this::listByParent),
                 pathCall("/api/category/create", this::create),
                 pathCall("/api/category/update", this::update)
-        ).withAutoAcl(true);
+        ).withHeaderFilter(new CorsFilter()).withAutoAcl(true);
     }
 }

@@ -1,8 +1,6 @@
 package io.dworkin.security.impl;
 
-import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.transport.Forbidden;
-import com.lightbend.lagom.javadsl.api.transport.ResponseHeader;
 import com.lightbend.lagom.javadsl.server.HeaderServiceCall;
 import com.lightbend.lagom.javadsl.server.ServerServiceCall;
 
@@ -44,10 +42,5 @@ public abstract class SecuredServiceImpl {
                 return authCall.invoke(request);
             else throw new Forbidden("Permissions denied");
         }));
-    }
-
-    protected <Request, Response> HeaderServiceCall<Request, Response> withCors(ServerServiceCall<Request, Response> corsCall) {
-        return (requestHeader, request) -> corsCall.invoke(request)
-                .thenApply(response -> Pair.create(ResponseHeader.OK.withHeader("Access-Control-Allow-Origin", "*"), response));
     }
 }
