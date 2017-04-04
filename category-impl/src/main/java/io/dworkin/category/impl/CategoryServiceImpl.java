@@ -65,7 +65,7 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
         return authorized(singletonList("category-management"), createRequest -> {
             log.info("Create category method was invoked with params: {}", createRequest);
 
-            return categoryRepository.create(new Category(createRequest.name, createRequest.displayName), createRequest.parent,
+            return categoryRepository.create(new Category(createRequest.name, createRequest.displayName, false), createRequest.parent,
                     createRequest.properties).thenApply(res -> "ok");
         });
     }
@@ -75,7 +75,7 @@ public class CategoryServiceImpl extends SecuredServiceImpl implements CategoryS
         return authorized(singletonList("category-management"), updateRequest -> {
             log.info("Update category method was invoked with params: {}", updateRequest);
 
-            return categoryRepository.update(new Category(updateRequest.name, updateRequest.displayName), updateRequest.parent,
+            return categoryRepository.update(new Category(updateRequest.name, updateRequest.displayName, false), updateRequest.parent,
                     updateRequest.properties).thenApply(res -> "ok");
         });
     }

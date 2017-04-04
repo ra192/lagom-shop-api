@@ -16,10 +16,13 @@ public final class Category {
 
     public final String name;
     public final String displayName;
+    public final Boolean hasChildren;
 
     @JsonCreator
-    public Category(@JsonProperty("name") String name, @JsonProperty("displayName") String displayName) {
+    public Category(@JsonProperty("name") String name, @JsonProperty("displayName") String displayName,
+                    @JsonProperty("hasChildren") Boolean hasChildren) {
         this.name = name;
         this.displayName = displayName;
+        this.hasChildren = hasChildren;
     }
 }

@@ -31,14 +31,15 @@ public class CategoryRepository {
 
         final CompletableFuture<Optional<Category>> future = new CompletableFuture<>();
 
-        connectionPool.query("select * from category where name=$1", Arrays.asList(name), result -> {
-            if (result.size() > 0) {
-                future.complete(Optional.of(new Category(result.row(0).getString("name"),
-                        result.row(0).getString("displayName"))));
-            } else {
-                future.complete(Optional.empty());
-            }
-        }, future::completeExceptionally);
+        connectionPool.query("select *, exists(select * from category where parent_id=cat.id) from category as cat where name=$1",
+                Arrays.asList(name), result -> {
+                    if (result.size() > 0) {
+                        future.complete(Optional.of(new Category(result.row(0).getString("name"),
+                                result.row(0).getString("displayName"), result.row(0).getBoolean("exists"))));
+                    } else {
+                        future.complete(Optional.empty());
+                    }
+                }, future::completeExceptionally);
 
         return future;
     }
@@ -46,11 +47,12 @@ public class CategoryRepository {
     public CompletionStage<PSequence<Category>> listRoots() {
         final CompletableFuture<PSequence<Category>> future = new CompletableFuture<>();
 
-        final String query = "select * from category where parent_id is null";
+        final String query = "select *, exists(select * from category where parent_id=cat.id) from category as cat where parent_id is null";
 
         connectionPool.query(query,
                 result -> future.complete(TreePVector.from(StreamSupport.stream(result.spliterator(), false)
-                        .map(row -> new Category(row.getString("name"), row.getString("displayname")))
+                        .map(row -> new Category(row.getString("name"), row.getString("displayname"),
+                                result.row(0).getBoolean("exists")))
                         .collect(Collectors.toList()))),
                 future::completeExceptionally);
 
@@ -61,11 +63,12 @@ public class CategoryRepository {
 
         final CompletableFuture<PSequence<Category>> future = new CompletableFuture<>();
 
-        final String query = "select * from category where parent_id = (select id from category where name=$1)";
+        final String query = "select *, exists(select * from category where parent_id=cat.id) from category as cat where parent_id = (select id from category where name=$1)";
 
         connectionPool.query(query, Arrays.asList(name),
                 result -> future.complete(TreePVector.from(StreamSupport.stream(result.spliterator(), false)
-                        .map(row -> new Category(row.getString("name"), row.getString("displayname")))
+                        .map(row -> new Category(row.getString("name"), row.getString("displayname"),
+                                result.row(0).getBoolean("exists")))
                         .collect(Collectors.toList()))),
                 future::completeExceptionally);
 
