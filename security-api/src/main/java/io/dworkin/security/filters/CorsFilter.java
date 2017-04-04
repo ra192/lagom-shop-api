@@ -22,7 +22,7 @@ public class CorsFilter implements HeaderFilter {
     public ResponseHeader transformServerResponse(ResponseHeader responseHeader, RequestHeader requestHeader) {
         return responseHeader.
                 withHeader("Access-Control-Allow-Origin", "*")
-                .withHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+                .withHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     }
 
     @Override
