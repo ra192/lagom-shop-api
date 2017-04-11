@@ -46,7 +46,8 @@ public interface ProductService extends Service {
         return named("product").withCalls(
                 restCall(Method.POST, "/api/product/list", this::listFiltered),
                 restCall(Method.OPTIONS, "/api/product/list", this::optionsRequest),
-                pathCall("/api/product/countPropertyValues", this::countPropertyValues),
+                restCall(Method.POST,"/api/product/countPropertyValues", this::countPropertyValues),
+                restCall(Method.OPTIONS,"/api/product/countPropertyValues", this::optionsRequest),
                 pathCall("/api/product/create", this::create),
                 pathCall("/api/product/update", this::update)
         ).withHeaderFilter(new CorsFilter()).withAutoAcl(true);

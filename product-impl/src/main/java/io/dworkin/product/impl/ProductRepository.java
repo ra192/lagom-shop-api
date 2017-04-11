@@ -2,20 +2,22 @@ package io.dworkin.product.impl;
 
 import akka.japi.Pair;
 import com.github.pgasync.ConnectionPool;
-import com.github.pgasync.Row;
 import io.dworkin.product.api.Product;
 import io.dworkin.product.api.PropertyWithCount;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.stream.StreamSupport;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * Created by yakov on 19.03.2017.
@@ -60,7 +62,7 @@ public class ProductRepository {
         queryBuilder.append(" limit ").append(max).append(" offset ").append(first);
 
         connectionPool.query(queryBuilder.toString(),
-                queryRes -> future.complete(TreePVector.from(StreamSupport.stream(queryRes.spliterator(), false).map(row ->
+                queryRes -> future.complete(TreePVector.from(stream(queryRes.spliterator(), false).map(row ->
                         new Product(row.getString("code"), row.getString("displayName"),
                                 row.getBigDecimal("price").doubleValue(), row.getString("description"),
                                 row.getString("imageUrl"))).collect(toList()))), future::completeExceptionally);
@@ -104,17 +106,13 @@ public class ProductRepository {
 
         connectionPool.query(queryBuilder.toString(),
                 queryRes -> {
-                    final List<PropertyWithCount> result = new ArrayList<>();
-                    PropertyWithCount resultItem = null;
-                    for (Row row : queryRes) {
-                        if (resultItem == null || !resultItem.name.equals(row.getString("prop_name"))) {
-                            resultItem = new PropertyWithCount(row.getString("prop_name"), row.getString("prop_displayname"), TreePVector.empty());
-                            result.add(resultItem);
-                        }
-
-                        resultItem.propertyValues.plus(new PropertyWithCount.PropertyValueWithCount(row.getString("propval_name"),
-                                row.getString("propval_displayname"), row.getLong("count")));
-                    }
+                    final List<PropertyWithCount> result = stream(queryRes.spliterator(), false).collect(
+                            groupingBy(row -> row.getString("prop_name"))).entrySet().stream().map(ent ->
+                            new PropertyWithCount(ent.getKey(), ent.getValue().get(0).getString("prop_displayname"),
+                                    TreePVector.from(ent.getValue().stream().map(row ->
+                                            new PropertyWithCount.PropertyValueWithCount(row.getString("propval_name"),
+                                                    row.getString("propval_displayname"), row.getLong("count")))
+                                            .collect(toList())))).collect(toList());
 
                     future.complete(TreePVector.from(result));
                 }, future::completeExceptionally);
