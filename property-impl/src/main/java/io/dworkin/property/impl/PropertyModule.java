@@ -1,7 +1,4 @@
-/*
- * Copyright (C) 2016-2017 Lightbend Inc. <https://www.lightbend.com>
- */
-package io.dworkin.category.impl;
+package io.dworkin.property.impl;
 
 import com.github.pgasync.ConnectionPool;
 import com.github.pgasync.ConnectionPoolBuilder;
@@ -10,18 +7,18 @@ import com.google.inject.Provides;
 import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import io.dworkin.category.api.CategoryService;
+import io.dworkin.property.api.PropertyService;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
 
 /**
- * The module that binds the CategoryService so that it can be served.
+ * Created by yakov on 20.03.2017.
  */
-public class CategoryModule extends AbstractModule implements ServiceGuiceSupport {
+public class PropertyModule extends AbstractModule implements ServiceGuiceSupport {
     @Override
     protected void configure() {
         bindServices(
-                serviceBinding(CategoryService.class, CategoryServiceImpl.class)
+                serviceBinding(PropertyService.class,PropertyServiceImpl.class)
         );
     }
 
@@ -43,12 +40,12 @@ public class CategoryModule extends AbstractModule implements ServiceGuiceSuppor
     }
 
     @Provides
-    CategoryRepository provideCategoryRepository(ConnectionPool connectionPool) {
-        return new CategoryRepository(connectionPool);
+    PropertyRepository productRepository(ConnectionPool connectionPool) {
+        return new PropertyRepository(connectionPool);
     }
 
     @Provides
-    UserRepository provideUserRepository(ConnectionPool connectionPool) {
+    UserRepository userRepository(ConnectionPool connectionPool) {
         return new UserRepository(connectionPool);
     }
 

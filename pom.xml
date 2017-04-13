@@ -20,6 +20,8 @@
         <module>authorization-api</module>
         <module>authorization-impl</module>
         <module>security-api</module>
+        <module>property-api</module>
+        <module>property-impl</module>
     </modules>
 
     <build>

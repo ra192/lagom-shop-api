@@ -1,7 +1,7 @@
 package io.dworkin.category.tests;
 
-import io.dworkin.product.api.Category;
-import io.dworkin.product.api.CategoryService;
+import io.dworkin.category.api.Category;
+import io.dworkin.category.api.CategoryService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

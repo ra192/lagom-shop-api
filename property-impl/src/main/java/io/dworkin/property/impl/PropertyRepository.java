@@ -1,6 +1,8 @@
 package io.dworkin.property.impl;
 
 import com.github.pgasync.ConnectionPool;
+import io.dworkin.property.api.Property;
+import io.dworkin.property.api.PropertyValue;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -19,16 +21,16 @@ public class PropertyRepository {
         this.connectionPool = connectionPool;
     }
 
-    public CompletionStage<Optional<PropertyEntity>> getByName(String name) {
+    public CompletionStage<Optional<Property>> getByName(String name) {
 
-        final CompletableFuture<Optional<PropertyEntity>> future = new CompletableFuture<>();
+        final CompletableFuture<Optional<Property>> future = new CompletableFuture<>();
 
         String query = "select * from property where name=$1";
 
         connectionPool.query(query, Arrays.asList(name), result -> {
             if (result.size() > 0)
                 future.complete(Optional.of(
-                        new PropertyEntity(result.row(0).getString("name"), result.row(0).getString("displayName"))));
+                        new Property(result.row(0).getString("name"), result.row(0).getString("displayName"))));
             else
                 future.complete(Optional.empty());
         }, future::completeExceptionally);
@@ -36,7 +38,7 @@ public class PropertyRepository {
         return future;
     }
 
-    public CompletionStage<Long> create(PropertyEntity property) {
+    public CompletionStage<Long> create(Property property) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
@@ -47,13 +49,28 @@ public class PropertyRepository {
         return future;
     }
 
-    public CompletionStage<Long> update(PropertyEntity property) {
+    public CompletionStage<Long> update(Property property) {
 
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
         String query = "UPDATE property SET displayname=$1 WHERE name=$2";
         connectionPool.query(query, Arrays.asList(property.getDisplayName(), property.getName()),
                 res -> future.complete(1L), future::completeExceptionally);
+
+        return future;
+    }
+
+    public CompletionStage<Optional<PropertyValue>>getPropertyValueByName(String name) {
+        final CompletableFuture<Optional<PropertyValue>> future = new CompletableFuture<>();
+        final String query = "select * from property_value where name=$1";
+
+        connectionPool.query(query, Arrays.asList(name), result -> {
+            if (result.size() > 0)
+                future.complete(Optional.of(
+                        new PropertyValue(result.row(0).getString("name"), result.row(0).getString("displayName"))));
+            else
+                future.complete(Optional.empty());
+        }, future::completeExceptionally);
 
         return future;
     }

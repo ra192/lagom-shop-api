@@ -1,13 +1,10 @@
-package io.dworkin.product.api;
+package io.dworkin.category.api;
 
 import akka.Done;
 import akka.NotUsed;
 import com.lightbend.lagom.javadsl.api.Descriptor;
 import com.lightbend.lagom.javadsl.api.*;
-import com.lightbend.lagom.javadsl.api.transport.HeaderFilter;
 import com.lightbend.lagom.javadsl.api.transport.Method;
-import com.lightbend.lagom.javadsl.api.transport.RequestHeader;
-import com.lightbend.lagom.javadsl.api.transport.ResponseHeader;
 import io.dworkin.security.filters.CorsFilter;
 import org.pcollections.PSequence;
 

@@ -3,7 +3,7 @@ package io.dworkin.product.impl;
 import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
-import io.dworkin.product.api.*;
+import io.dworkin.category.api.*;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
@@ -68,7 +68,8 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
                     Futures.sequence(propertyValues.stream().map(pair -> productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
 
             return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new).thenApply(pair ->
-                    new CountPropertyValuesResponse(pair.first(), TreePVector.from(pair.second())));
+                    new CountPropertyValuesResponse(pair.first(), TreePVector.from(pair.second().stream()
+                            .map(res -> res.get(0)).collect(toList()))));
         };
     }
 

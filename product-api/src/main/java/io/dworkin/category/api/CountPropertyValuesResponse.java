@@ -1,4 +1,4 @@
-package io.dworkin.product.api;
+package io.dworkin.category.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,11 +13,11 @@ import org.pcollections.PSequence;
 @JsonSerialize
 public final class CountPropertyValuesResponse {
     public final PSequence<PropertyWithCount> properties;
-    public final PSequence<PSequence<PropertyWithCount>> additionalProperties;
+    public final PSequence<PropertyWithCount> additionalProperties;
 
     @JsonCreator
     public CountPropertyValuesResponse(@JsonProperty("properties") PSequence<PropertyWithCount> properties,
-                                       @JsonProperty("additionalProperties") PSequence<PSequence<PropertyWithCount>> additionalProperties) {
+                                       @JsonProperty("additionalProperties") PSequence<PropertyWithCount> additionalProperties) {
         this.properties = properties;
         this.additionalProperties = additionalProperties;
     }

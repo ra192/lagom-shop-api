@@ -2,7 +2,7 @@ package io.dworkin.category.impl;
 
 
 import com.github.pgasync.ConnectionPool;
-import io.dworkin.product.api.Category;
+import io.dworkin.category.api.Category;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 

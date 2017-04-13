@@ -7,7 +7,7 @@ import com.google.inject.Provides;
 import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import io.dworkin.product.api.ProductService;
+import io.dworkin.category.api.ProductService;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
 

@@ -1,7 +1,7 @@
 package io.dworkin.product.tests;
 
 import com.lightbend.lagom.javadsl.testkit.ServiceTest;
-import io.dworkin.product.api.*;
+import io.dworkin.category.api.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,8 +12,6 @@ import java.util.List;
 import static com.lightbend.lagom.javadsl.testkit.ServiceTest.defaultSetup;
 import static com.lightbend.lagom.javadsl.testkit.ServiceTest.startServer;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 

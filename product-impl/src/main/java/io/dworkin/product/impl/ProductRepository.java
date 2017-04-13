@@ -2,8 +2,8 @@ package io.dworkin.product.impl;
 
 import akka.japi.Pair;
 import com.github.pgasync.ConnectionPool;
-import io.dworkin.product.api.Product;
-import io.dworkin.product.api.PropertyWithCount;
+import io.dworkin.category.api.Product;
+import io.dworkin.category.api.PropertyWithCount;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 
