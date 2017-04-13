@@ -46,8 +46,8 @@ public class ProductServiceTest {
     @Test
     public void listFilteredWithProperties() throws Exception {
         final ListFilteredRequest request = new ListFilteredRequest("cpu", TreePVector.from(asList(
-                new Property("manufacturer", TreePVector.singleton("intel")),
-                new Property("socket", TreePVector.from(asList("socket-1150", "socket-2011"))))),
+                new PropertyRequest("manufacturer", TreePVector.singleton("intel")),
+                new PropertyRequest("socket", TreePVector.from(asList("socket-1150", "socket-2011"))))),
                 null, null, null, null);
         List<Product> products = productService.listFiltered().invoke(request).toCompletableFuture().get(5, SECONDS);
         assertEquals(80, products.size());
@@ -63,7 +63,7 @@ public class ProductServiceTest {
     @Test
     public void countWithProperties() throws Exception {
         CountPropertyValuesRequest request = new CountPropertyValuesRequest("cpu", TreePVector.singleton(
-                new Property("manufacturer", TreePVector.singleton("intel"))));
+                new PropertyRequest("manufacturer", TreePVector.singleton("intel"))));
         CountPropertyValuesResponse propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
         assertEquals(1, propertyValueResponse.properties.size());
     }

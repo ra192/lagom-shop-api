@@ -13,13 +13,13 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @JsonDeserialize
-public class Property {
+public class PropertyRequest {
 
     public final String name;
     public final PSequence<String> propertyValues;
 
     @JsonCreator
-    public Property(@JsonProperty("name") String name, @JsonProperty("propertyValues") PSequence<String> propertyValues) {
+    public PropertyRequest(@JsonProperty("name") String name, @JsonProperty("propertyValues") PSequence<String> propertyValues) {
         this.name = name;
         this.propertyValues = propertyValues;
     }

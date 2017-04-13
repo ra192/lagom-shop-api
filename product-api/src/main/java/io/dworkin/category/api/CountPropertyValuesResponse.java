@@ -14,12 +14,15 @@ import org.pcollections.PSequence;
 public final class CountPropertyValuesResponse {
     public final PSequence<PropertyWithCount> properties;
     public final PSequence<PropertyWithCount> additionalProperties;
+    public final PSequence<PropertyWithCount> selectedProperties;
 
     @JsonCreator
     public CountPropertyValuesResponse(@JsonProperty("properties") PSequence<PropertyWithCount> properties,
-                                       @JsonProperty("additionalProperties") PSequence<PropertyWithCount> additionalProperties) {
+                                       @JsonProperty("additionalProperties") PSequence<PropertyWithCount> additionalProperties,
+                                       @JsonProperty("selectedProperties") PSequence<PropertyWithCount> selectedProperties) {
         this.properties = properties;
         this.additionalProperties = additionalProperties;
+        this.selectedProperties = selectedProperties;
     }
 
 

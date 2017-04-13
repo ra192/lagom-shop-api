@@ -16,14 +16,14 @@ import javax.annotation.concurrent.Immutable;
 @JsonDeserialize
 public final class ListFilteredRequest {
     public final String category;
-    public final PSequence<Property> properties;
+    public final PSequence<PropertyRequest> properties;
     public final Integer first;
     public final Integer max;
     public final String orderBy;
     public final Boolean isAsc;
 
     @JsonCreator
-    public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<Property> properties,
+    public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<PropertyRequest> properties,
                                @JsonProperty("first") Integer first, @JsonProperty("max") Integer max,
                                @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsk") Boolean isAsc) {
         this.category = Preconditions.checkNotNull(category);

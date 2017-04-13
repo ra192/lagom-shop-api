@@ -4,6 +4,9 @@ import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
 import io.dworkin.category.api.*;
+import io.dworkin.property.api.Property;
+import io.dworkin.property.api.PropertyService;
+import io.dworkin.property.api.PropertyValue;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
@@ -16,6 +19,7 @@ import play.libs.concurrent.Futures;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.stream.Collectors.toList;
@@ -27,14 +31,16 @@ import static java.util.stream.Collectors.toList;
 public class ProductServiceImpl extends SecuredServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final PropertyService propertyService;
     private final Config config;
 
     private final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Inject
-    public ProductServiceImpl(ProductRepository productRepository, UserRepository userRepository, TokenRepository tokenRepository, Config config) {
+    public ProductServiceImpl(ProductRepository productRepository, UserRepository userRepository, TokenRepository tokenRepository, PropertyService propertyService, Config config) {
         super(userRepository, tokenRepository);
         this.productRepository = productRepository;
+        this.propertyService = propertyService;
         this.config = config;
     }
 
@@ -67,9 +73,21 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             final CompletionStage<List<PSequence<PropertyWithCount>>> additionalPropertyValuesStages =
                     Futures.sequence(propertyValues.stream().map(pair -> productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
 
-            return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new).thenApply(pair ->
-                    new CountPropertyValuesResponse(pair.first(), TreePVector.from(pair.second().stream()
-                            .map(res -> res.get(0)).collect(toList()))));
+            final CompletionStage<List<Pair<Optional<Property>, List<Optional<PropertyValue>>>>> selectedPropertiesStages =
+                    Futures.sequence(request.properties.stream().map(prop -> propertyService.getByName(prop.name).invoke()
+                            .thenCombine(Futures.sequence(prop.propertyValues.stream().map(valName ->
+                                    propertyService.getPropertyValueByName(valName).invoke()).collect(toList())), Pair::new))
+                            .collect(toList()));
+
+            return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new)
+                    .thenCombine(selectedPropertiesStages, Pair::new).thenApply(result ->
+                            new CountPropertyValuesResponse(result.first().first(), TreePVector.from(result.first().second().stream()
+                                    .map(res -> res.get(0)).collect(toList())), TreePVector.from(result.second().stream()
+                                    .map(res -> new PropertyWithCount(res.first().get().getName(), res.first().get().getDisplayName(),
+                                            TreePVector.from(res.second().stream().map(itm ->
+                                                    new PropertyWithCount.PropertyValueWithCount(itm.get().getName(),
+                                                            itm.get().getDisplayName(), 0L)).collect(toList()))))
+                                    .collect(toList()))));
         };
     }
 

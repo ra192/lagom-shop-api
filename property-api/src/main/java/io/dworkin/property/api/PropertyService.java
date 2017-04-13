@@ -17,10 +17,13 @@ public interface PropertyService extends Service {
 
     ServiceCall<NotUsed, Optional<PropertyValue>> getPropertyValueByName(String name);
 
+    ServiceCall<NotUsed, Optional<Property>> getByName(String name);
+
     @Override
     default Descriptor descriptor() {
         return named("property").withCalls(
-                pathCall("/api/property/getValue/:name", this::getPropertyValueByName)
+                pathCall("/api/property/getValue/:name", this::getPropertyValueByName),
+                pathCall("/api/property/get/:name", this::getByName)
         ).withHeaderFilter(new CorsFilter()).withAutoAcl(true);
     }
 }

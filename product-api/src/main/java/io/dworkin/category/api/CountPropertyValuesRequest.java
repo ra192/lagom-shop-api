@@ -16,10 +16,10 @@ import javax.annotation.concurrent.Immutable;
 @JsonDeserialize
 public final class CountPropertyValuesRequest {
     public final String category;
-    public final PSequence<Property> properties;
+    public final PSequence<PropertyRequest> properties;
 
     @JsonCreator
-    public CountPropertyValuesRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<Property> properties) {
+    public CountPropertyValuesRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<PropertyRequest> properties) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
     }
