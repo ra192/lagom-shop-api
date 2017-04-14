@@ -1,4 +1,4 @@
-package io.dworkin.category.api;
+package io.dworkin.product.api;
 
 import akka.Done;
 import akka.NotUsed;
@@ -32,7 +32,7 @@ public interface ProductService extends Service {
      *
      * @return products list
      */
-    ServiceCall<CountPropertyValuesRequest, CountPropertyValuesResponse> countPropertyValues();
+    ServiceCall<CountPropertyValuesRequest, PSequence<PropertyWithCount>> countPropertyValues();
 
     ServiceCall<ManageProductRequest, String> create();
 

@@ -1,9 +1,9 @@
-package io.dworkin.product.impl;
+package io.dworkin.product.api.impl;
 
 import akka.japi.Pair;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
 import com.typesafe.config.Config;
-import io.dworkin.category.api.*;
+import io.dworkin.product.api.*;
 import io.dworkin.property.api.Property;
 import io.dworkin.property.api.PropertyService;
 import io.dworkin.property.api.PropertyValue;
@@ -18,6 +18,7 @@ import play.libs.concurrent.Futures;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
@@ -60,7 +61,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
     }
 
     @Override
-    public ServiceCall<CountPropertyValuesRequest, CountPropertyValuesResponse> countPropertyValues() {
+    public ServiceCall<CountPropertyValuesRequest, PSequence<PropertyWithCount>> countPropertyValues() {
         return request -> {
             log.info("Product count name values method was invoked with: {}", request);
 
@@ -71,7 +72,8 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
                     productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, null, propertyValues);
 
             final CompletionStage<List<PSequence<PropertyWithCount>>> additionalPropertyValuesStages =
-                    Futures.sequence(propertyValues.stream().map(pair -> productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
+                    Futures.sequence(propertyValues.stream().map(pair ->
+                            productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
 
             final CompletionStage<List<Pair<Optional<Property>, List<Optional<PropertyValue>>>>> selectedPropertiesStages =
                     Futures.sequence(request.properties.stream().map(prop -> propertyService.getByName(prop.name).invoke()
@@ -80,15 +82,29 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
                             .collect(toList()));
 
             return propertyValuesStage.thenCombine(additionalPropertyValuesStages, Pair::new)
-                    .thenCombine(selectedPropertiesStages, Pair::new).thenApply(result ->
-                            new CountPropertyValuesResponse(result.first().first(), TreePVector.from(result.first().second().stream()
-                                    .map(res -> res.get(0)).collect(toList())), TreePVector.from(result.second().stream()
-                                    .map(res -> new PropertyWithCount(res.first().get().getName(), res.first().get().getDisplayName(),
-                                            TreePVector.from(res.second().stream().map(itm ->
-                                                    new PropertyWithCount.PropertyValueWithCount(itm.get().getName(),
-                                                            itm.get().getDisplayName(), 0L)).collect(toList()))))
-                                    .collect(toList()))));
+                    .thenCombine(selectedPropertiesStages, Pair::new).thenApply(result -> createCountResponse(result));
         };
+    }
+
+    private PSequence<PropertyWithCount> createCountResponse(Pair<Pair<PSequence<PropertyWithCount>,
+            List<PSequence<PropertyWithCount>>>, List<Pair<Optional<Property>, List<Optional<PropertyValue>>>>> result) {
+        final List<PropertyWithCount> props = result.second().stream().map(p -> {
+            final List<PropertyWithCount.PropertyValueWithCount> propVals = p.second().stream().map(propValOpt ->
+                    new PropertyWithCount.PropertyValueWithCount(propValOpt.get().getName(),
+                            propValOpt.get().getDisplayName(), 0L, true)).collect(toList());
+            propVals.addAll(result.first().second().stream().map(seq -> seq.get(0))
+                    .filter(itm -> itm.name.equals(p.first().get().getName())).findFirst().get().propertyValues);
+            propVals.sort(Comparator.comparing(o->o.displayName));
+
+            return new PropertyWithCount(p.first().get().getName(), p.first().get().getDisplayName(), TreePVector.from(propVals), true);
+        }).collect(toList());
+
+        props.addAll(result.first().first());
+        props.sort(Comparator.comparing(o->o.displayName));
+
+        final PSequence<PropertyWithCount> response = TreePVector.from(props);
+
+        return response;
     }
 
     @Override

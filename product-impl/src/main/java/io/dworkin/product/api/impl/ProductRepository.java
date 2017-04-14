@@ -1,9 +1,9 @@
-package io.dworkin.product.impl;
+package io.dworkin.product.api.impl;
 
 import akka.japi.Pair;
 import com.github.pgasync.ConnectionPool;
-import io.dworkin.category.api.Product;
-import io.dworkin.category.api.PropertyWithCount;
+import io.dworkin.product.api.Product;
+import io.dworkin.product.api.PropertyWithCount;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 
@@ -111,8 +111,8 @@ public class ProductRepository {
                             new PropertyWithCount(ent.getKey(), ent.getValue().get(0).getString("prop_displayname"),
                                     TreePVector.from(ent.getValue().stream().map(row ->
                                             new PropertyWithCount.PropertyValueWithCount(row.getString("propval_name"),
-                                                    row.getString("propval_displayname"), row.getLong("count")))
-                                            .collect(toList())))).collect(toList());
+                                                    row.getString("propval_displayname"), row.getLong("count"), false))
+                                            .collect(toList())), property!=null)).collect(toList());
 
                     future.complete(TreePVector.from(result));
                 }, future::completeExceptionally);

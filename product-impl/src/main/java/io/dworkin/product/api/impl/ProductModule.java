@@ -1,14 +1,13 @@
-package io.dworkin.product.impl;
+package io.dworkin.product.api.impl;
 
 import com.github.pgasync.ConnectionPool;
 import com.github.pgasync.ConnectionPoolBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.lightbend.lagom.javadsl.api.ServiceInfo;
 import com.lightbend.lagom.javadsl.server.ServiceGuiceSupport;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import io.dworkin.category.api.ProductService;
+import io.dworkin.product.api.ProductService;
 import io.dworkin.property.api.PropertyService;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;

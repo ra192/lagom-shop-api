@@ -1,4 +1,4 @@
-package io.dworkin.category.api;
+package io.dworkin.product.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

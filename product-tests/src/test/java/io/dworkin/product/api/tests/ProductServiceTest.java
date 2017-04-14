@@ -1,10 +1,11 @@
-package io.dworkin.product.tests;
+package io.dworkin.product.api.tests;
 
 import com.lightbend.lagom.javadsl.testkit.ServiceTest;
-import io.dworkin.category.api.*;
+import io.dworkin.product.api.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 
 import java.util.List;
@@ -56,15 +57,15 @@ public class ProductServiceTest {
     @Test
     public void countWithoutProperties() throws Exception {
         CountPropertyValuesRequest request = new CountPropertyValuesRequest("cpu", TreePVector.empty());
-        CountPropertyValuesResponse propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
-        assertEquals(2, propertyValueResponse.properties.size());
+        PSequence<PropertyWithCount> propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
+        assertEquals(2, propertyValueResponse.size());
     }
 
     @Test
     public void countWithProperties() throws Exception {
         CountPropertyValuesRequest request = new CountPropertyValuesRequest("cpu", TreePVector.singleton(
                 new PropertyRequest("manufacturer", TreePVector.singleton("intel"))));
-        CountPropertyValuesResponse propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
-        assertEquals(1, propertyValueResponse.properties.size());
+        PSequence<PropertyWithCount> propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
+        assertEquals(1, propertyValueResponse.size());
     }
 }
