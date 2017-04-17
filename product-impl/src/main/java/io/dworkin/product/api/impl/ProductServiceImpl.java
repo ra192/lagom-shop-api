@@ -92,9 +92,9 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             final List<PropertyWithCount.PropertyValueWithCount> propVals = p.second().stream().map(propValOpt ->
                     new PropertyWithCount.PropertyValueWithCount(propValOpt.get().getName(),
                             propValOpt.get().getDisplayName(), 0L, true)).collect(toList());
-            final Optional<PropertyWithCount> addProps = result.first().second().stream().filter(seq -> seq.size() > 0).map(seq -> seq.get(0))
-                    .filter(itm -> itm.name.equals(p.first().get().getName())).findFirst();
-            addProps.ifPresent(propertyWithCount -> propVals.addAll(propertyWithCount.propertyValues));
+            result.first().second().stream().filter(seq -> seq.size() > 0).map(seq -> seq.get(0))
+                    .filter(itm -> itm.name.equals(p.first().get().getName())).findFirst()
+                    .ifPresent(propertyWithCount -> propVals.addAll(propertyWithCount.propertyValues));
             propVals.sort(Comparator.comparing(o -> o.displayName));
 
             return new PropertyWithCount(p.first().get().getName(), p.first().get().getDisplayName(), TreePVector.from(propVals), true);
