@@ -24,7 +24,7 @@ public interface ProductService extends Service {
      *
      * @return products list
      */
-    ServiceCall<ListFilteredRequest, PSequence<Product>> listFiltered();
+    ServiceCall<ListFilteredRequest, ListFilteredResponse> listFiltered();
 
     /**
      * Get products list by category and product properties

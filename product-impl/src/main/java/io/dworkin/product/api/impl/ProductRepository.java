@@ -70,6 +70,17 @@ public class ProductRepository {
         return future;
     }
 
+    public CompletionStage<Long> countByCategoryNameAndPropertyValues(String category, PSequence<PSequence<String>> propertyValues) {
+        final CompletableFuture<Long> future = new CompletableFuture<>();
+
+        final StringBuilder queryBuilder = new StringBuilder("select count(*) from product as prod where category_id=(select id from category where name='").append(category).append("')");
+        buildPropertyValuesSubqueries(propertyValues, queryBuilder);
+
+        connectionPool.query(queryBuilder.toString(), queryRes -> future.complete(queryRes.row(0).getLong(0)), future::completeExceptionally);
+
+        return future;
+    }
+
     public CompletionStage<PSequence<PropertyWithCount>> countPropertyValuesByCategoryIdAndFilter(String category, String property, PSequence<Pair<String, PSequence<String>>> propertyValues) {
 
         final CompletableFuture<PSequence<PropertyWithCount>> future = new CompletableFuture<>();
@@ -112,7 +123,7 @@ public class ProductRepository {
                                     TreePVector.from(ent.getValue().stream().map(row ->
                                             new PropertyWithCount.PropertyValueWithCount(row.getString("propval_name"),
                                                     row.getString("propval_displayname"), row.getLong("count"), false))
-                                            .collect(toList())), property!=null)).collect(toList());
+                                            .collect(toList())), property != null)).collect(toList());
 
                     future.complete(TreePVector.from(result));
                 }, future::completeExceptionally);

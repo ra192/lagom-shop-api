@@ -46,7 +46,7 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
     }
 
     @Override
-    public ServiceCall<ListFilteredRequest, PSequence<Product>> listFiltered() {
+    public ServiceCall<ListFilteredRequest, ListFilteredResponse> listFiltered() {
         return request -> {
             log.info("Product list filtered method was invoked with: {}", request);
 
@@ -55,8 +55,14 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             final String orderBy = (request.orderBy != null) ? request.orderBy : "displayName";
             final Boolean isAsk = (request.isAsc != null) ? request.isAsc : true;
 
-            return productRepository.listByCategoryNameAndPropertyValues(request.category, TreePVector.from(
-                    request.properties.stream().map(propItm -> propItm.propertyValues).collect(toList())), first, max, orderBy, isAsk);
+            final TreePVector<PSequence<String>> propertyValues = TreePVector.from(
+                    request.properties.stream().map(propItm -> propItm.propertyValues).collect(toList()));
+
+            final CompletionStage<PSequence<Product>> productsStage = productRepository.listByCategoryNameAndPropertyValues(request.category, propertyValues, first, max, orderBy, isAsk);
+
+            final CompletionStage<Long> countStage = productRepository.countByCategoryNameAndPropertyValues(request.category, propertyValues);
+
+            return productsStage.thenCombine(countStage,Pair::new).thenApply(p->new ListFilteredResponse(p.first(),p.second()));
         };
     }
 
