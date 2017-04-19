@@ -25,7 +25,7 @@ public final class ListFilteredRequest {
     @JsonCreator
     public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<PropertyRequest> properties,
                                @JsonProperty("first") Integer first, @JsonProperty("max") Integer max,
-                               @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsk") Boolean isAsc) {
+                               @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsc") Boolean isAsc) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
         this.first = first;
@@ -39,6 +39,9 @@ public final class ListFilteredRequest {
         return MoreObjects.toStringHelper(this)
                 .add("category", category)
                 .add("properties", properties)
+                .add("max", max)
+                .add("orderBy", orderBy)
+                .add("isAsc",isAsc)
                 .toString();
     }
 }
