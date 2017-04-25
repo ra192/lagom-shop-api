@@ -17,11 +17,15 @@ import javax.annotation.concurrent.Immutable;
 public final class CountPropertyValuesRequest {
     public final String category;
     public final PSequence<PropertyRequest> properties;
+    public final String searchText;
 
     @JsonCreator
-    public CountPropertyValuesRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<PropertyRequest> properties) {
+    public CountPropertyValuesRequest(@JsonProperty("category") String category,
+                                      @JsonProperty("properties") PSequence<PropertyRequest> properties,
+                                      @JsonProperty("searchText") String searchText) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
+        this.searchText = searchText;
     }
 
     @Override
@@ -29,6 +33,7 @@ public final class CountPropertyValuesRequest {
         return MoreObjects.toStringHelper(this)
                 .add("category", category)
                 .add("properties", properties)
+                .add("searchText", searchText)
                 .toString();
     }
 }

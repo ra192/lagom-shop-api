@@ -49,11 +49,14 @@ public class ProductRepository {
     }
 
     public CompletionStage<PSequence<Product>> listByCategoryNameAndPropertyValues(String category, PSequence<PSequence<String>> propertyValues,
-                                                                                   Integer first, Integer max, String orderProperty, Boolean isAsc) {
+                                                                                   Integer first, Integer max, String orderProperty, Boolean isAsc, String searchText) {
 
         final CompletableFuture<PSequence<Product>> future = new CompletableFuture<>();
 
         final StringBuilder queryBuilder = new StringBuilder("select * from product as prod where category_id=(select id from category where name='").append(category).append("')");
+        if(searchText!=null) {
+            queryBuilder.append(" and displayname @@ plainto_tsquery('english', '").append(searchText).append("')");
+        }
 
         buildPropertyValuesSubqueries(propertyValues, queryBuilder);
         queryBuilder.append(" order by ").append(orderProperty);
@@ -70,10 +73,15 @@ public class ProductRepository {
         return future;
     }
 
-    public CompletionStage<Long> countByCategoryNameAndPropertyValues(String category, PSequence<PSequence<String>> propertyValues) {
+    public CompletionStage<Long> countByCategoryNameAndPropertyValues(String category, PSequence<PSequence<String>> propertyValues, String searchText) {
         final CompletableFuture<Long> future = new CompletableFuture<>();
 
         final StringBuilder queryBuilder = new StringBuilder("select count(*) from product as prod where category_id=(select id from category where name='").append(category).append("')");
+
+        if(searchText!=null) {
+            queryBuilder.append(" and displayname @@ plainto_tsquery('english', '").append(searchText).append("')");
+        }
+
         buildPropertyValuesSubqueries(propertyValues, queryBuilder);
 
         connectionPool.query(queryBuilder.toString(), queryRes -> future.complete(queryRes.row(0).getLong(0)), future::completeExceptionally);
@@ -81,7 +89,7 @@ public class ProductRepository {
         return future;
     }
 
-    public CompletionStage<PSequence<PropertyWithCount>> countPropertyValuesByCategoryIdAndFilter(String category, String property, PSequence<Pair<String, PSequence<String>>> propertyValues) {
+    public CompletionStage<PSequence<PropertyWithCount>> countPropertyValuesByCategoryIdAndFilter(String category, String property, PSequence<Pair<String, PSequence<String>>> propertyValues, String searchText) {
 
         final CompletableFuture<PSequence<PropertyWithCount>> future = new CompletableFuture<>();
 
@@ -91,6 +99,10 @@ public class ProductRepository {
                 .append(" inner join property_value as propval on propval.id=ppv.propertyvalues_id")
                 .append(" inner join property as prop on prop.id=propval.property_id")
                 .append(" where prod.category_id=(select id from category where name='").append(category).append("')");
+
+        if(searchText!=null) {
+            queryBuilder.append(" and prod.displayname @@ plainto_tsquery('english', '").append(searchText).append("')");
+        }
 
         if (property != null) {
             queryBuilder.append(" and prop.name = '").append(property).append("'");

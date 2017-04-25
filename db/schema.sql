@@ -111,6 +111,7 @@ CREATE SEQUENCE product_id_seq
 
 ALTER TABLE product_id_seq OWNER TO myshop;
 
+create index product_displayname_idx on product using GIN (to_tsvector('english', displayname));
 --
 -- TOC entry 188 (class 1259 OID 74726)
 -- Name: product_property_value; Type: TABLE; Schema: public; Owner: myshop

@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 
-import java.util.List;
-
 import static com.lightbend.lagom.javadsl.testkit.ServiceTest.defaultSetup;
 import static com.lightbend.lagom.javadsl.testkit.ServiceTest.startServer;
 import static java.util.Arrays.asList;
@@ -39,7 +37,7 @@ public class ProductServiceTest {
 
     @Test
     public void listFilteredWithoutProperties() throws Exception {
-        final ListFilteredRequest request = new ListFilteredRequest("cpu", TreePVector.empty(), null, null, null, null);
+        final ListFilteredRequest request = new ListFilteredRequest("cpu", TreePVector.empty(), null, null, null, null, null);
         ListFilteredResponse response = productService.listFiltered().invoke(request).toCompletableFuture().get(5, SECONDS);
         assertEquals(100, response.products.size());
     }
@@ -49,14 +47,14 @@ public class ProductServiceTest {
         final ListFilteredRequest request = new ListFilteredRequest("cpu", TreePVector.from(asList(
                 new PropertyRequest("manufacturer", TreePVector.singleton("intel")),
                 new PropertyRequest("socket", TreePVector.from(asList("socket-1150", "socket-2011"))))),
-                null, null, null, null);
+                null, null, null, null, null);
         ListFilteredResponse response = productService.listFiltered().invoke(request).toCompletableFuture().get(5, SECONDS);
         assertEquals(80, response.products.size());
     }
 
     @Test
     public void countWithoutProperties() throws Exception {
-        CountPropertyValuesRequest request = new CountPropertyValuesRequest("cpu", TreePVector.empty());
+        CountPropertyValuesRequest request = new CountPropertyValuesRequest("cpu", TreePVector.empty(), null);
         PSequence<PropertyWithCount> propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
         assertEquals(2, propertyValueResponse.size());
     }
@@ -64,7 +62,7 @@ public class ProductServiceTest {
     @Test
     public void countWithProperties() throws Exception {
         CountPropertyValuesRequest request = new CountPropertyValuesRequest("cpu", TreePVector.singleton(
-                new PropertyRequest("manufacturer", TreePVector.singleton("intel"))));
+                new PropertyRequest("manufacturer", TreePVector.singleton("intel"))), null);
         PSequence<PropertyWithCount> propertyValueResponse = productService.countPropertyValues().invoke(request).toCompletableFuture().get(5, SECONDS);
         assertEquals(1, propertyValueResponse.size());
     }

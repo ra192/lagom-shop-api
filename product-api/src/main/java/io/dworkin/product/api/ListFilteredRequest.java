@@ -21,17 +21,20 @@ public final class ListFilteredRequest {
     public final Integer max;
     public final String orderBy;
     public final Boolean isAsc;
+    public final String searchText;
 
     @JsonCreator
     public ListFilteredRequest(@JsonProperty("category") String category, @JsonProperty("properties") PSequence<PropertyRequest> properties,
                                @JsonProperty("first") Integer first, @JsonProperty("max") Integer max,
-                               @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsc") Boolean isAsc) {
+                               @JsonProperty("orderBy") String orderBy, @JsonProperty("isAsc") Boolean isAsc,
+                               @JsonProperty("searchText") String searchText) {
         this.category = Preconditions.checkNotNull(category);
         this.properties = properties;
         this.first = first;
         this.max = max;
         this.orderBy = orderBy;
         this.isAsc = isAsc;
+        this.searchText = searchText;
     }
 
     @Override
@@ -41,7 +44,8 @@ public final class ListFilteredRequest {
                 .add("properties", properties)
                 .add("max", max)
                 .add("orderBy", orderBy)
-                .add("isAsc",isAsc)
+                .add("isAsc", isAsc)
+                .add("searchText", searchText)
                 .toString();
     }
 }

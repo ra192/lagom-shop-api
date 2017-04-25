@@ -10,6 +10,7 @@ import io.dworkin.property.api.PropertyValue;
 import io.dworkin.security.impl.SecuredServiceImpl;
 import io.dworkin.security.impl.TokenRepository;
 import io.dworkin.security.impl.UserRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.pcollections.PSequence;
 import org.pcollections.TreePVector;
 import org.slf4j.Logger;
@@ -54,15 +55,16 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
             final Integer max = (request.max != null) ? request.max : first + config.getInt("product.list.max.default");
             final String orderBy = (request.orderBy != null) ? request.orderBy : "displayName";
             final Boolean isAsk = (request.isAsc != null) ? request.isAsc : true;
+            final String searchTest = (StringUtils.isNotBlank(request.searchText)) ? request.searchText : null;
 
             final TreePVector<PSequence<String>> propertyValues = TreePVector.from(
                     request.properties.stream().map(propItm -> propItm.propertyValues).collect(toList()));
 
-            final CompletionStage<PSequence<Product>> productsStage = productRepository.listByCategoryNameAndPropertyValues(request.category, propertyValues, first, max, orderBy, isAsk);
+            final CompletionStage<PSequence<Product>> productsStage = productRepository.listByCategoryNameAndPropertyValues(request.category, propertyValues, first, max, orderBy, isAsk, searchTest);
 
-            final CompletionStage<Long> countStage = productRepository.countByCategoryNameAndPropertyValues(request.category, propertyValues);
+            final CompletionStage<Long> countStage = productRepository.countByCategoryNameAndPropertyValues(request.category, propertyValues, searchTest);
 
-            return productsStage.thenCombine(countStage,Pair::new).thenApply(p->new ListFilteredResponse(p.first(),p.second()));
+            return productsStage.thenCombine(countStage, Pair::new).thenApply(p -> new ListFilteredResponse(p.first(), p.second()));
         };
     }
 
@@ -71,15 +73,17 @@ public class ProductServiceImpl extends SecuredServiceImpl implements ProductSer
         return request -> {
             log.info("Product count name values method was invoked with: {}", request);
 
+            final String searchTest = (StringUtils.isNotBlank(request.searchText)) ? request.searchText : null;
+
             final PSequence<Pair<String, PSequence<String>>> propertyValues = TreePVector.from(request.properties.stream()
                     .map(itm -> new Pair<>(itm.name, itm.propertyValues)).collect(toList()));
 
             final CompletionStage<PSequence<PropertyWithCount>> propertyValuesStage =
-                    productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, null, propertyValues);
+                    productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, null, propertyValues, searchTest);
 
             final CompletionStage<List<PSequence<PropertyWithCount>>> additionalPropertyValuesStages =
                     Futures.sequence(propertyValues.stream().map(pair ->
-                            productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues)).collect(toList()));
+                            productRepository.countPropertyValuesByCategoryIdAndFilter(request.category, pair.first(), propertyValues, searchTest)).collect(toList()));
 
             final CompletionStage<List<Pair<Optional<Property>, List<Optional<PropertyValue>>>>> selectedPropertiesStages =
                     Futures.sequence(request.properties.stream().map(prop -> propertyService.getByName(prop.name).invoke()
